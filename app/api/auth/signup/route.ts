@@ -17,17 +17,10 @@ export async function POST(req: NextRequest) {
     const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
-      // Reuse existing user record instead of creating a duplicate
-      return NextResponse.json({
-        success: true,
-        message: 'Account already exists. Please login instead.',
-        user: {
-          id: existingUser._id.toString(),
-          name: existingUser.name || '',
-          email: existingUser.email,
-          phone: existingUser.phone || '',
-        },
-      });
+      return NextResponse.json(
+        { error: 'Email already exists. Please login instead.' },
+        { status: 409 }
+      );
     }
 
     // Create new user with normalized email
@@ -52,19 +45,10 @@ export async function POST(req: NextRequest) {
     } catch (err: any) {
       // Defensive duplicate-key handling (race conditions)
       if (err?.code === 11000) {
-        const existing = await User.findOne({ email: normalizedEmail });
-        if (existing) {
-          return NextResponse.json({
-            success: true,
-            message: 'Account already exists. Please login instead.',
-            user: {
-              id: existing._id.toString(),
-              name: existing.name || '',
-              email: existing.email,
-              phone: existing.phone || '',
-            },
-          });
-        }
+        return NextResponse.json(
+          { error: 'Email already exists. Please login instead.' },
+          { status: 409 }
+        );
       }
 
       console.error('Signup DB error:', err);
@@ -81,4 +65,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

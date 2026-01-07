@@ -159,14 +159,14 @@ export default async function HomePage() {
       <section className="relative py-24 bg-stone-900 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-40">
            <img 
-             src="https://images.unsplash.com/photo-1596436098086-f7e4a7a8d3c0?q=80&w=2000&auto=format&fit=crop" 
+             src="https://images.unsplash.com/photo-1546551812-9a44595c5fea?q=80&w=1035&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
              alt="Candle making" 
              className="w-full h-full object-cover" 
            />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
            <span className="inline-block py-1 px-3 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs font-bold tracking-widest uppercase mb-8">Our Philosophy</span>
-           <h2 className="text-3xl md:text-5xl font-serif font-medium mb-8 leading-tight">
+           <h2 className="text-3xl md:text-5xl font-serif font-medium mb-8 leading-tight text-white/80">
              "We believe in the power of scent to <br className="hidden md:block" /> transform a space and uplift the spirit."
            </h2>
            <p className="max-w-2xl mx-auto text-lg text-stone-300 mb-10 leading-relaxed">

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AuthTabs from '@/components/AuthTabs';
 import { login, verifyOTP } from '@/lib/api-client';
@@ -15,6 +16,17 @@ export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+
+  function QueryInit({ setEmail, setStep }: { setEmail: (v: string) => void; setStep: (v: 'email' | 'otp') => void }) {
+    const searchParams = useSearchParams();
+    useEffect(() => {
+      const qEmail = searchParams.get('email');
+      const qStep = searchParams.get('step');
+      if (qEmail) setEmail(qEmail);
+      if (qStep === 'otp') setStep('otp');
+    }, [searchParams]);
+    return null;
+  }
 
   async function handleSendOTP(e: React.FormEvent) {
     e.preventDefault();
@@ -64,7 +76,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px] flex flex-col justify-between p-12 text-white">
           <Link href="/" className="text-2xl font-serif tracking-wide">AuraFarm</Link>
           <div className="max-w-md">
-            <h2 className="text-4xl font-serif mb-4">Welcome Back</h2>
+            <h2 className="text-4xl font-serif mb-4 text-white/80 ">Welcome Back</h2>
             <p className="text-stone-200 text-lg">Sign in to access your order history, saved addresses, and exclusive member benefits.</p>
           </div>
         </div>
@@ -77,6 +89,9 @@ export default function LoginPage() {
             <h1 className="text-3xl font-serif text-stone-900">Login</h1>
             <p className="text-stone-500 mt-2">Enter your email to receive a secure login code.</p>
           </div>
+          <Suspense>
+            <QueryInit setEmail={setEmail} setStep={setStep} />
+          </Suspense>
 
           {step === 'email' ? (
             <form onSubmit={handleSendOTP} className="space-y-6">

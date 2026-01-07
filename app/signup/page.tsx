@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthTabs from '@/components/AuthTabs';
-import { createAccount } from '@/lib/api-client';
+import { createAccount, login } from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
 export default function SignupPage() {
@@ -53,9 +53,10 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      await createAccount(formData.name, formData.email, formData.phone);
-      toast.success('Account created! Please login to continue.');
-      router.push('/login');
+      const res = await createAccount(formData.name, formData.email, formData.phone);
+      await login(formData.email);
+      toast.success('Account created! We sent an OTP to your email.');
+      router.push(`/login?email=${encodeURIComponent(formData.email)}&step=otp`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -68,14 +69,14 @@ export default function SignupPage() {
       {/* Left Side - Image */}
       <div className="hidden lg:block lg:w-1/2 relative overflow-hidden">
         <img 
-          src="https://images.unsplash.com/photo-1596436098086-f7e4a7a8d3c0?q=80&w=2000&auto=format&fit=crop" 
+          src="https://images.unsplash.com/photo-1602523961358-f9f03dd557db?q=80&w=2000&auto=format&fit=crop" 
           alt="Signup Background" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px] flex flex-col justify-between p-12 text-white">
           <Link href="/" className="text-2xl font-serif tracking-wide">AuraFarm</Link>
           <div className="max-w-md">
-            <h2 className="text-4xl font-serif mb-4">Join Our Community</h2>
+            <h2 className="text-4xl font-serif mb-4 text-white/80 ">Join Our Community</h2>
             <p className="text-stone-200 text-lg">Create an account to track orders, save favorites, and receive early access to new collections.</p>
           </div>
         </div>
