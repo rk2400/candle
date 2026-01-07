@@ -75,14 +75,15 @@ export default function AboutPage() {
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 h-96 md:h-[600px]">
           <div className="h-full rounded-2xl overflow-hidden relative group">
-            <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop" alt="Gallery 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          </div>
-          <div className="h-full rounded-2xl overflow-hidden relative group md:mt-12">
-            <img src="https://images.unsplash.com/photo-1602523961358-f9f03dd557db?q=80&w=800&auto=format&fit=crop" alt="Gallery 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="https://images.unsplash.com/photo-1619799360851-a143fbc240b3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNhbmRsZXxlbnwwfHwwfHx8MA%3D%3D" alt="Gallery 1" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
           </div>
           <div className="h-full rounded-2xl overflow-hidden relative group">
-            <img src="https://images.unsplash.com/photo-1526318472351-c75fcf070d2f?q=80&w=800&auto=format&fit=crop" alt="Gallery 3" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src="https://images.unsplash.com/photo-1514436598301-27a65f40469f?q=80&w=1007&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gallery 2" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
           </div>
+          <div className="h-full rounded-2xl overflow-hidden relative group">
+            <img src="https://plus.unsplash.com/premium_photo-1666717576644-5701d3406840?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gallery 3" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          </div>
+          
         </div>
       </main>
     </div>

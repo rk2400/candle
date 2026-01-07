@@ -195,12 +195,12 @@ export default function ProductDetailPage() {
                   </div>
                   
                   <div className="text-center sm:text-left">
-                    <button 
+                    {/* <button 
                       onClick={() => removeFromCart(product._id)}
                       className="text-sm text-stone-400 hover:text-red-500 underline transition-colors"
                     >
                       Remove from Cart
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               ) : (

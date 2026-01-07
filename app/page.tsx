@@ -65,7 +65,7 @@ export default async function HomePage() {
             />
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-2xl font-serif mb-2">Floral Notes</h3>
+              <h3 className="text-2xl text-white/80 font-serif mb-2">Floral Notes</h3>
               <p className="text-white/80 text-sm mb-4">Gardenia, Rose, & Jasmine</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Floral</span>
             </div>
@@ -74,13 +74,13 @@ export default async function HomePage() {
           {/* Collection 2 */}
           <div className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
             <img 
-              src="https://images.unsplash.com/photo-1610212595088-21f456816e87?q=80&w=800&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1577025728734-7ec67bdb97d0?q=80&w=2950&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Woody Collection" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-2xl font-serif mb-2">Earthy & Woody</h3>
+              <h3 className="text-2xl text-white/80 font-serif mb-2">Earthy & Woody</h3>
               <p className="text-white/80 text-sm mb-4">Sandalwood, Pine, & Amber</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Earthy</span>
             </div>
@@ -89,13 +89,13 @@ export default async function HomePage() {
           {/* Collection 3 */}
           <div className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
             <img 
-              src="https://images.unsplash.com/photo-1572559529573-23b05a62e089?q=80&w=800&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1612293905607-b003de9e54fb?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Fresh Collection" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
             <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-2xl font-serif mb-2">Fresh & Clean</h3>
+              <h3 className="text-2xl text-white/80 font-serif mb-2">Fresh & Clean</h3>
               <p className="text-white/80 text-sm mb-4">Linen, Sea Salt, & Citrus</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Fresh</span>
             </div>
