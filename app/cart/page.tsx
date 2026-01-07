@@ -195,7 +195,7 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-8">
             {items.map((item) => (
-              <div key={item.id} className="flex gap-6 p-6 bg-white rounded-xl shadow-sm border border-stone-100">
+              <div key={item.productId} className="flex gap-6 p-6 bg-white rounded-xl shadow-sm border border-stone-100">
                 <div className="w-24 h-24 bg-stone-100 rounded-lg overflow-hidden flex-shrink-0">
                   {item.image ? (
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -207,7 +207,7 @@ export default function CartPage() {
                   <div className="flex justify-between items-start">
                     <h3 className="text-lg font-medium text-stone-900 font-serif">{item.name}</h3>
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.productId)}
                       className="text-stone-400 hover:text-red-500 transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -218,14 +218,14 @@ export default function CartPage() {
                   <div className="flex justify-between items-end">
                     <div className="flex items-center border border-stone-200 rounded-lg">
                       <button 
-                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
                         className="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-900"
                       >
                         -
                       </button>
                       <span className="w-8 text-center text-sm font-medium text-stone-900">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                         className="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-900"
                       >
                         +
@@ -347,3 +347,4 @@ export default function CartPage() {
     </div>
   );
 }
+

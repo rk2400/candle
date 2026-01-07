@@ -109,3 +109,4 @@ function SocialLink({ href, icon, label }: { href: string; icon: React.ReactNode
     </a>
   );
 }
+

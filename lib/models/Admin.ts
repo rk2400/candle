@@ -30,3 +30,4 @@ const Admin: Model<IAdmin> = mongoose.models.Admin || mongoose.model<IAdmin>('Ad
 export default Admin;
 
 
+

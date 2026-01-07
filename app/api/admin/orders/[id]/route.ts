@@ -48,12 +48,12 @@ async function handler(
           else if (orderStatus === 'SHIPPED') templateType = 'ORDER_SHIPPED';
           else if (orderStatus === 'DELIVERED') templateType = 'ORDER_DELIVERED';
 
-          let template = await EmailTemplate.findOne({ type: templateType });
-          if (!template) {
-            template = {
-              type: templateType,
-              subject: `Order ${orderStatus} - AuraFarm`,
-              body: `
+          const foundTemplate = await EmailTemplate.findOne({ type: templateType });
+          const subject =
+            foundTemplate?.subject ?? `Order ${orderStatus} - AuraFarm`;
+          const body =
+            foundTemplate?.body ??
+            `
                 <h2>Hello {{userName}}!</h2>
                 <p>Your order status has been updated!</p>
                 <p><strong>Order ID:</strong> {{orderId}}</p>
@@ -61,13 +61,11 @@ async function handler(
                 <h3>Order Summary:</h3>
                 {{products}}
                 <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
-              `,
-            } as any;
-          }
+              `;
 
           await emailService.sendOrderEmail(
             user.email,
-            { subject: template.subject, body: template.body },
+            { subject, body },
             {
               orderId: order._id.toString(),
               userName: user.email.split('@')[0],
@@ -98,4 +96,3 @@ async function handler(
 
 export const GET = withAdminAuth(handler);
 export const PUT = withAdminAuth(handler);
-

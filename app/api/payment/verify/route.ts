@@ -62,13 +62,12 @@ async function handler(req: AuthRequest) {
     const user = await User.findById(req.user.userId);
 
     // Get email template
-    let template = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
-    if (!template) {
-      // Default template
-      template = {
-        type: 'ORDER_CREATED',
-        subject: 'Order Confirmed - AuraFarm',
-        body: `
+    const foundTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
+    const subject =
+      foundTemplate?.subject ?? 'Order Confirmed - AuraFarm';
+    const emailBody =
+      foundTemplate?.body ??
+      `
           <h2>Hello {{userName}}!</h2>
           <p>Your order has been confirmed!</p>
           <p><strong>Order ID:</strong> {{orderId}}</p>
@@ -77,15 +76,13 @@ async function handler(req: AuthRequest) {
           {{products}}
           <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
           <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
-        `,
-      } as any;
-    }
+        `;
 
     // Send order confirmation email
     if (user) {
       await emailService.sendOrderEmail(
         user.email,
-        { subject: template.subject, body: template.body },
+        { subject, body: emailBody },
         {
           orderId: order._id.toString(),
           userName: user.email.split('@')[0],
@@ -118,4 +115,3 @@ async function handler(req: AuthRequest) {
 }
 
 export const POST = withAuth(handler);
-

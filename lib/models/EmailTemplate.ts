@@ -38,3 +38,4 @@ const EmailTemplate: Model<IEmailTemplate> =
 export default EmailTemplate;
 
 
+

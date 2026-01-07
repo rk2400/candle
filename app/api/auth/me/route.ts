@@ -10,7 +10,7 @@ async function handler(req: AuthRequest) {
     console.log('[auth/me] Request headers:', Object.fromEntries((req as any).headers?.entries ? req.headers.entries() : []));
     try {
       console.log('[auth/me] Cookies raw:', req.cookies);
-    } catch (e) {
+    } catch (e: any) {
       console.log('[auth/me] Cookies unavailable', e?.message || e);
     }
 
@@ -79,4 +79,3 @@ async function handler(req: AuthRequest) {
 }
 
 export const GET = withAuth(handler);
-

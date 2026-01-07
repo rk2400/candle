@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { authConfig } from './config';
 
@@ -10,7 +10,8 @@ export interface JWTPayload {
 }
 
 export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, authConfig.jwtSecret, { expiresIn: authConfig.jwtExpiry });
+  const options: SignOptions = { expiresIn: authConfig.jwtExpiry as any };
+  return jwt.sign(payload, authConfig.jwtSecret as any, options);
 }
 
 export function verifyToken(token: string): JWTPayload | null {
@@ -32,4 +33,3 @@ export async function comparePassword(password: string, hash: string): Promise<b
 export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
-

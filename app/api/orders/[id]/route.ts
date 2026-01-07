@@ -40,3 +40,4 @@ async function handler(req: AuthRequest, ctx?: any) {
 export const GET = withAuth(handler);
 
 
+
