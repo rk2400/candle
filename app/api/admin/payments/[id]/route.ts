@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Order from '@/lib/models/Order';
+import EmailTemplate from '@/lib/models/EmailTemplate';
 import Product from '@/lib/models/Product';
 import User from '@/lib/models/User';
-import EmailTemplate from '@/lib/models/EmailTemplate';
 import { withAdminAuth, AuthRequest } from '@/lib/middleware';
 import { emailService } from '@/lib/email';
 import { z } from 'zod';
@@ -46,42 +46,74 @@ async function handler(req: AuthRequest, { params }: { params: { id: string } })
         order.adminPaymentNote = adminNote || '';
         await order.save();
 
-        // Send order confirmation email to user using ORDER_CREATED template
+        // Send both PAYMENT_CONFIRMED and ORDER_CONFIRMED emails to user
         if (userEmail) {
-          // Get ORDER_CREATED email template
-          const orderTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
-          const subject = orderTemplate?.subject ?? 'Order Confirmed - LittleFlame';
-          const body = orderTemplate?.body ?? `
-            <h2>Hello {{userName}}!</h2>
-            <p>Your order has been confirmed!</p>
-            <p><strong>Order ID:</strong> {{orderId}}</p>
-            <p><strong>Status:</strong> {{status}}</p>
-            <h3>Order Summary:</h3>
-            {{products}}
-            <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
-            <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
-          `;
+          try {
+            // Fetch both email templates
+            const paymentTemplate = await EmailTemplate.findOne({ type: 'PAYMENT_CONFIRMED' });
+            const orderTemplate = await EmailTemplate.findOne({ type: 'ORDER_CONFIRMED' });
 
-          await emailService.sendOrderEmail(
-            userEmail,
-            { subject, body },
-            {
-              orderId: order._id.toString(),
-              userName: user.name || userEmail.split('@')[0],
-              status: 'CREATED',
-              products: order.products.map((p: any) => ({
-                name: p.name,
-                quantity: p.quantity,
-                price: p.price * p.quantity,
-              })),
-              totalAmount: order.totalAmount,
+            // Email 1: Payment Confirmed
+            if (paymentTemplate) {
+              let paymentSubject = paymentTemplate.subject
+                .replace(/\{\{orderId\}\}/g, order._id.toString())
+                .replace(/\{\{userName\}\}/g, userName)
+                .replace(/\{\{totalAmount\}\}/g, `₹${order.totalAmount.toFixed(2)}`);
+
+              let paymentBody = paymentTemplate.body;
+
+              await emailService.sendOrderEmail(
+                userEmail,
+                { subject: paymentSubject, body: paymentBody },
+                {
+                  orderId: order._id.toString(),
+                  userName,
+                  status: 'PAID',
+                  products: order.products.map((p: any) => ({
+                    name: p.name,
+                    quantity: p.quantity,
+                    price: p.price * p.quantity,
+                  })),
+                  totalAmount: order.totalAmount,
+                }
+              );
             }
-          );
+
+            // Email 2: Order Confirmed
+            if (orderTemplate) {
+              let orderSubject = orderTemplate.subject
+                .replace(/\{\{orderId\}\}/g, order._id.toString())
+                .replace(/\{\{userName\}\}/g, userName)
+                .replace(/\{\{status\}\}/g, order.orderStatus)
+                .replace(/\{\{totalAmount\}\}/g, `₹${order.totalAmount.toFixed(2)}`);
+
+              let orderBody = orderTemplate.body;
+
+              await emailService.sendOrderEmail(
+                userEmail,
+                { subject: orderSubject, body: orderBody },
+                {
+                  orderId: order._id.toString(),
+                  userName,
+                  status: order.orderStatus,
+                  products: order.products.map((p: any) => ({
+                    name: p.name,
+                    quantity: p.quantity,
+                    price: p.price * p.quantity,
+                  })),
+                  totalAmount: order.totalAmount,
+                }
+              );
+            }
+          } catch (emailError) {
+            console.error('Error sending confirmation emails:', emailError);
+            // Don't fail the approval if email fails, but log it
+          }
         }
 
         return NextResponse.json({
           success: true,
-          message: 'Payment approved. Order confirmation email sent to customer.',
+          message: 'Payment approved. Payment confirmed and order confirmed emails sent to customer.',
           order: {
             id: order._id,
             paymentStatus: order.paymentStatus,

@@ -80,6 +80,32 @@ const defaultTemplates = [
       <p>Thank you for your understanding.</p>
     `,
   },
+  {
+    type: 'PAYMENT_CONFIRMED',
+    subject: 'Payment Confirmed - LittleFlame',
+    body: `
+      <h2>Hello {{userName}}!</h2>
+      <p>Your payment has been confirmed successfully!</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Amount Received:</strong> ₹{{totalAmount}}</p>
+      <p>Thank you for your payment. Your order will be processed shortly and you'll receive a confirmation email soon.</p>
+      <p>If you have any questions, please don't hesitate to contact us.</p>
+    `,
+  },
+  {
+    type: 'ORDER_CONFIRMED',
+    subject: 'Your Order is Confirmed - LittleFlame',
+    body: `
+      <h2>Hello {{userName}}!</h2>
+      <p>Great news! Your order has been confirmed and will be shipped soon.</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <h3>Order Summary:</h3>
+      {{products}}
+      <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+      <p>We'll keep you updated as your order progresses. Thank you for shopping with LittleFlame!</p>
+    `,
+  },
 ];
 
 async function initTemplates() {

@@ -27,7 +27,7 @@ async function handler(
 
     // Determine template type based on current order status
     let templateType: any = 'ORDER_CREATED';
-    if (order.orderStatus === 'PAYMENT_PENDING') templateType = 'ORDER_CREATED';
+    if (order.orderStatus === 'CREATED') templateType = 'ORDER_CREATED';
     else if (order.orderStatus === 'PACKED') templateType = 'ORDER_PACKED';
     else if (order.orderStatus === 'SHIPPED') templateType = 'ORDER_SHIPPED';
     else if (order.orderStatus === 'DELIVERED') templateType = 'ORDER_DELIVERED';
