@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Order from '@/lib/models/Order';
+import Product from '@/lib/models/Product';
 import { withAuth, AuthRequest } from '@/lib/middleware';
 
 async function handler(req: AuthRequest, ctx?: any) {

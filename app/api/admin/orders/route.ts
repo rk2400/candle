@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Order from '@/lib/models/Order';
+import Product from '@/lib/models/Product';
 import { withAdminAuth } from '@/lib/middleware';
 
 export const GET = withAdminAuth(async (req) => {
@@ -21,4 +22,3 @@ export const GET = withAdminAuth(async (req) => {
     );
   }
 });
-
