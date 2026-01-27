@@ -17,11 +17,18 @@ class EmailService {
       this.transporter = nodemailer.createTransport({
         host: emailConfig.host,
         port: emailConfig.port,
-        secure: emailConfig.port === 465, // true for 465, false for other ports
+        secure: emailConfig.secure,
         auth: {
           user: emailConfig.user,
           pass: emailConfig.pass,
         },
+      });
+
+      // Optional connection verification for clearer diagnostics
+      this.transporter.verify().then(() => {
+        console.log('Email transporter verified and ready');
+      }).catch((err) => {
+        console.error('Email transporter verification failed:', err?.message || err);
       });
     }
   }
@@ -207,4 +214,3 @@ class EmailService {
 }
 
 export const emailService = new EmailService();
-

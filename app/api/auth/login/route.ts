@@ -66,7 +66,13 @@ export async function POST(req: NextRequest) {
 
     // Send OTP email (use original email for display, normalized for storage)
     console.log('[auth/login] Sending OTP email to', normalizedEmail);
-    await emailService.sendOTP(normalizedEmail, code);
+    const sent = await emailService.sendOTP(normalizedEmail, code);
+    if (!sent) {
+      return NextResponse.json(
+        { error: 'Failed to send OTP email. Please try again later.' },
+        { status: 500 }
+      );
+    }
     console.log('[auth/login] OTP email send attempted for', normalizedEmail);
 
     return NextResponse.json({
@@ -81,4 +87,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
