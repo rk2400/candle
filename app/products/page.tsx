@@ -39,7 +39,10 @@ export default async function ProductsPage({ searchParams }: { searchParams: { c
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex gap-6 text-sm font-medium text-stone-500 overflow-x-auto no-scrollbar">
             {categories.map((cat) => {
-              const isActive = cat === 'All Scents' ? !searchParams.category : searchParams.category === cat;
+              const isActive = cat === 'All Scents' 
+                ? !searchParams.category 
+                : searchParams.category === cat;
+              
               return (
                 <Link 
                   key={cat}

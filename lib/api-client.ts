@@ -235,6 +235,18 @@ export async function sendOrderEmail(id: string) {
   return data;
 }
 
+export async function cancelOrder(id: string, reason?: string) {
+  const res = await fetch(`${API_URL}/api/admin/orders/${id}/cancel`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ reason }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to cancel order');
+  return data;
+}
+
 export async function getEmailTemplates() {
   const res = await fetch(`${API_URL}/api/admin/email-templates`, {
     credentials: 'include',

@@ -14,20 +14,38 @@ export default function ContactPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Mock form submission
-    setTimeout(() => {
-      toast.success('Thank you for your message! We\'ll get back to you soon.');
+    
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      toast.success(data.message || 'Thank you for your message! We\'ll get back to you soon.');
       setFormData({ name: '', email: '', message: '' });
+    } catch (error: any) {
+      console.error('Contact form error:', error);
+      toast.error(error.message || 'Failed to send message. Please try again later.');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }
 
   async function copyEmail() {
     try {
-      await navigator.clipboard.writeText('support@littleflame.com');
+      await navigator.clipboard.writeText('littleflame.official@gmail.com');
       toast.success('Email copied to clipboard');
     } catch (e) {
-      toast('support@littleflame.com');
+      toast('littleflame.official@gmail.com');
     }
   }
 

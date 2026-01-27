@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-export type EmailTemplateType = 'ORDER_CREATED' | 'ORDER_PACKED' | 'ORDER_SHIPPED' | 'ORDER_DELIVERED';
+export type EmailTemplateType = 'ORDER_CREATED' | 'ORDER_PACKED' | 'ORDER_SHIPPED' | 'ORDER_DELIVERED' | 'ORDER_CANCELLED';
 
 export interface IEmailTemplate extends Document {
   type: EmailTemplateType;
@@ -14,7 +14,7 @@ const EmailTemplateSchema: Schema = new Schema(
   {
     type: {
       type: String,
-      enum: ['ORDER_CREATED', 'ORDER_PACKED', 'ORDER_SHIPPED', 'ORDER_DELIVERED'],
+      enum: ['ORDER_CREATED', 'ORDER_PACKED', 'ORDER_SHIPPED', 'ORDER_DELIVERED', 'ORDER_CANCELLED'],
       required: true,
       unique: true,
     },

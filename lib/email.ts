@@ -5,6 +5,7 @@ interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }
 
 class EmailService {
@@ -41,6 +42,7 @@ class EmailService {
         to: options.to,
         subject: options.subject,
         html: options.html,
+        replyTo: options.replyTo,
       });
 
       return true;

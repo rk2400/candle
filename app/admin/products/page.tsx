@@ -73,7 +73,7 @@ export default function AdminProductsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product: any) => (
-              <div key={product._id} className="card">
+              <div key={product._id} className="card p-6">
                 {product.images && product.images[0] && (
                   <img
                     src={product.images[0]}

@@ -4,14 +4,21 @@ import Link from 'next/link';
 import { useUser } from '@/lib/contexts/UserContext';
 import { useCart } from '@/lib/contexts/CartContext';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Header() {
   const { user, loading, logout } = useUser();
   const { getItemCount, clearCart } = useCart();
   const router = useRouter();
   const pathname = usePathname();
-  const cartCount = getItemCount();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Only show cart count after component has mounted to avoid hydration mismatch
+  const cartCount = mounted ? getItemCount() : 0;
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

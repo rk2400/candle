@@ -65,6 +65,21 @@ const defaultTemplates = [
       <p>Thank you for shopping with LittleFlame! We hope you love your candles.</p>
     `,
   },
+  {
+    type: 'ORDER_CANCELLED',
+    subject: 'Order Cancelled - LittleFlame',
+    body: `
+      <h2>Hello {{userName}}!</h2>
+      <p>We're sorry to inform you that your order has been cancelled.</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <h3>Order Summary:</h3>
+      {{products}}
+      <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+      <p>If you have any questions or concerns, please contact our support team.</p>
+      <p>Thank you for your understanding.</p>
+    `,
+  },
 ];
 
 async function initTemplates() {

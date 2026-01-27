@@ -17,7 +17,18 @@ export async function getProductsFromDb(opts: GetProductsOptions = {}) {
 
   if (status) query.status = status;
   if (typeof featured === 'boolean') query.featured = featured;
-  if (category) query.category = category;
+  if (category) {
+    // Normalize category to lowercase to match database enum values
+    // Map common display names to database values
+    const categoryMap: Record<string, string> = {
+      'Floral': 'floral',
+      'Woody': 'woody',
+      'Fresh': 'fresh',
+      'Seasonal': 'seasonal',
+    };
+    const normalizedCategory = categoryMap[category] || category.toLowerCase();
+    query.category = normalizedCategory;
+  }
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },

@@ -17,6 +17,7 @@ export default function OrdersPage() {
     if (s === 'DELIVERED') return 'Delivered';
     if (s === 'SHIPPED') return 'Shipped';
     if (s === 'PACKED') return 'Packed';
+    if (s === 'CANCELLED') return 'Cancelled';
     return 'Order Placed';
   }
 
@@ -98,6 +99,7 @@ export default function OrdersPage() {
                         order.orderStatus === 'DELIVERED' ? 'bg-green-50 text-green-700 border border-green-100' :
                         order.orderStatus === 'SHIPPED' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
                         order.orderStatus === 'PACKED' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
+                        order.orderStatus === 'CANCELLED' ? 'bg-red-50 text-red-700 border border-red-100' :
                         'bg-stone-100 text-stone-600 border border-stone-200'
                       }`}>
                         {statusLabel(order.orderStatus)}

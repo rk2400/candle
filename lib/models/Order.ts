@@ -8,7 +8,7 @@ export interface IOrderItem {
   image?: string;
 }
 
-export type OrderStatus = 'CREATED' | 'PACKED' | 'SHIPPED' | 'DELIVERED';
+export type OrderStatus = 'CREATED' | 'PACKED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 export type PaymentStatus = 'PAYMENT_PENDING' | 'PAYMENT_SUBMITTED' | 'PAID' | 'PAYMENT_REJECTED';
 
 export interface IOrder extends Document {
@@ -99,7 +99,7 @@ const OrderSchema: Schema = new Schema(
     },
     orderStatus: {
       type: String,
-      enum: ['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED'],
+      enum: ['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
       default: 'CREATED',
     },
     paymentId: {
@@ -132,7 +132,12 @@ const OrderSchema: Schema = new Schema(
   }
 );
 
-const Order: Model<IOrder> = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
+// Delete the model from cache if it exists to ensure schema updates are applied
+if (mongoose.models.Order) {
+  delete mongoose.models.Order;
+}
+
+const Order: Model<IOrder> = mongoose.model<IOrder>('Order', OrderSchema);
 
 export default Order;
 

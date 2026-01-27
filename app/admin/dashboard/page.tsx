@@ -47,19 +47,19 @@ export default function AdminDashboard() {
         
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="card">
+            <div className="card p-6">
               <p className="text-gray-500 text-sm mb-1">Total Orders</p>
               <p className="text-3xl font-bold text-primary-600">{stats.totalOrders}</p>
             </div>
-            <div className="card">
+            <div className="card p-6">
               <p className="text-gray-500 text-sm mb-1">Total Revenue</p>
               <p className="text-3xl font-bold text-green-600">₹{stats.totalRevenue.toFixed(2)}</p>
             </div>
-            <div className="card">
+            <div className="card p-6">
               <p className="text-gray-500 text-sm mb-1">Active Products</p>
               <p className="text-3xl font-bold text-blue-600">{stats.totalProducts}</p>
             </div>
-            <div className="card">
+            <div className="card p-6">
               <p className="text-gray-500 text-sm mb-1">Total Users</p>
               <p className="text-3xl font-bold text-purple-600">{stats.totalUsers}</p>
             </div>
@@ -93,9 +93,9 @@ export default function AdminDashboard() {
         </div>
 
         {stats && stats.ordersByStatus && (
-          <div className="card">
+          <div className="card p-6">
             <h2 className="text-2xl font-bold mb-4">Orders by Status</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
                 <p className="text-gray-500 text-sm">CREATED</p>
                 <p className="text-2xl font-bold">{stats.ordersByStatus.CREATED || 0}</p>
@@ -111,6 +111,10 @@ export default function AdminDashboard() {
               <div>
                 <p className="text-gray-500 text-sm">DELIVERED</p>
                 <p className="text-2xl font-bold">{stats.ordersByStatus.DELIVERED || 0}</p>
+              </div>
+              <div>
+                <p className="text-gray-500 text-sm">CANCELLED</p>
+                <p className="text-2xl font-bold">{stats.ordersByStatus.CANCELLED || 0}</p>
               </div>
             </div>
           </div>

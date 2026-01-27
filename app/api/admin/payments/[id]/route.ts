@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import Order from '@/lib/models/Order';
 import Product from '@/lib/models/Product';
 import User from '@/lib/models/User';
+import EmailTemplate from '@/lib/models/EmailTemplate';
 import { withAdminAuth, AuthRequest } from '@/lib/middleware';
 import { emailService } from '@/lib/email';
 import { z } from 'zod';
@@ -45,13 +46,37 @@ async function handler(req: AuthRequest, { params }: { params: { id: string } })
         order.adminPaymentNote = adminNote || '';
         await order.save();
 
-        // Send order confirmation email to user
+        // Send order confirmation email to user using ORDER_CREATED template
         if (userEmail) {
-          await emailService.sendPaymentNotification(userEmail, 'approved', {
-            orderId: order._id.toString(),
-            userName,
-            totalAmount: order.totalAmount,
-          });
+          // Get ORDER_CREATED email template
+          const orderTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
+          const subject = orderTemplate?.subject ?? 'Order Confirmed - LittleFlame';
+          const body = orderTemplate?.body ?? `
+            <h2>Hello {{userName}}!</h2>
+            <p>Your order has been confirmed!</p>
+            <p><strong>Order ID:</strong> {{orderId}}</p>
+            <p><strong>Status:</strong> {{status}}</p>
+            <h3>Order Summary:</h3>
+            {{products}}
+            <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+            <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
+          `;
+
+          await emailService.sendOrderEmail(
+            userEmail,
+            { subject, body },
+            {
+              orderId: order._id.toString(),
+              userName: user.name || userEmail.split('@')[0],
+              status: 'CREATED',
+              products: order.products.map((p: any) => ({
+                name: p.name,
+                quantity: p.quantity,
+                price: p.price * p.quantity,
+              })),
+              totalAmount: order.totalAmount,
+            }
+          );
         }
 
         return NextResponse.json({

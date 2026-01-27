@@ -72,20 +72,25 @@ async function handler(req: AuthRequest) {
 
     // Get email template
     const foundTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
-    const subject =
-      foundTemplate?.subject ?? 'Order Confirmed - LittleFlame';
-    const emailBody =
-      foundTemplate?.body ??
-      `
-          <h2>Hello {{userName}}!</h2>
-          <p>Your order has been confirmed!</p>
-          <p><strong>Order ID:</strong> {{orderId}}</p>
-          <p><strong>Status:</strong> {{status}}</p>
-          <h3>Order Summary:</h3>
-          {{products}}
-          <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
-          <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
-        `;
+    let subject = foundTemplate?.subject ?? 'Order Confirmed - LittleFlame';
+    let emailBody = foundTemplate?.body ?? `
+      <h2>Hello {{userName}}!</h2>
+      <p>Your order has been confirmed!</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <h3>Order Summary:</h3>
+      {{products}}
+      <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+      <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
+    `;
+
+    // Replace variables in subject if any
+    const userName = user?.name || user?.email.split('@')[0] || 'Customer';
+    subject = subject
+      .replace(/\{\{orderId\}\}/g, order._id.toString())
+      .replace(/\{\{userName\}\}/g, userName)
+      .replace(/\{\{status\}\}/g, order.orderStatus)
+      .replace(/\{\{totalAmount\}\}/g, `₹${order.totalAmount.toFixed(2)}`);
 
     // Send order confirmation email
     if (user) {
@@ -94,7 +99,7 @@ async function handler(req: AuthRequest) {
         { subject, body: emailBody },
         {
           orderId: order._id.toString(),
-          userName: user.email.split('@')[0],
+          userName: userName,
           status: order.orderStatus,
           products: order.products.map((p: any) => ({
             name: p.name,

@@ -111,7 +111,7 @@ export default function AdminPaymentsPage() {
         </div>
 
         {payments.length === 0 ? (
-          <div className="card p-12 text-center">
+          <div className="card p-6 text-center">
             <p className="text-gray-500 text-lg">No pending payments for verification</p>
           </div>
         ) : (

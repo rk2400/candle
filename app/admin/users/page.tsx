@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
             <p className="text-gray-500 text-lg">No users found.</p>
           </div>
         ) : (
-          <div className="card overflow-x-auto">
+          <div className="card p-6 overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">

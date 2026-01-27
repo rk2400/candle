@@ -37,7 +37,7 @@ export const productSchema = z.object({
 });
 
 export const orderStatusSchema = z.object({
-  orderStatus: z.enum(['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED']),
+  orderStatus: z.enum(['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED']),
 });
 
 export const emailTemplateSchema = z.object({
@@ -76,4 +76,10 @@ export const applyCouponSchema = z.object({
       quantity: z.number().int().positive(),
     })
   ),
+});
+
+export const contactSchema = z.object({
+  name: z.string().min(1, 'Name is required').trim(),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters').trim(),
 });

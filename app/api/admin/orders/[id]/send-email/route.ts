@@ -25,32 +25,43 @@ async function handler(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    // Determine template type based on current order status
     let templateType: any = 'ORDER_CREATED';
-    if (order.orderStatus === 'PACKED') templateType = 'ORDER_PACKED';
+    if (order.orderStatus === 'PAYMENT_PENDING') templateType = 'ORDER_CREATED';
+    else if (order.orderStatus === 'PACKED') templateType = 'ORDER_PACKED';
     else if (order.orderStatus === 'SHIPPED') templateType = 'ORDER_SHIPPED';
     else if (order.orderStatus === 'DELIVERED') templateType = 'ORDER_DELIVERED';
+    else if (order.orderStatus === 'CANCELLED') templateType = 'ORDER_CANCELLED';
 
+    // Get email template from database
     const foundTemplate = await EmailTemplate.findOne({ type: templateType });
-    const subject =
-      foundTemplate?.subject ?? `Order ${order.orderStatus} - LittleFlame`;
-    const body =
-      foundTemplate?.body ??
-      `
-          <h2>Hello {{userName}}!</h2>
-          <p>Your order status update!</p>
-          <p><strong>Order ID:</strong> {{orderId}}</p>
-          <p><strong>Status:</strong> {{status}}</p>
-          <h3>Order Summary:</h3>
-          {{products}}
-          <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
-        `;
+    
+    // Use template subject and body, with fallback defaults
+    let subject = foundTemplate?.subject ?? `Order ${order.orderStatus} - LittleFlame`;
+    let body = foundTemplate?.body ?? `
+      <h2>Hello {{userName}}!</h2>
+      <p>Your order status update!</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <h3>Order Summary:</h3>
+      {{products}}
+      <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+    `;
+
+    // Replace variables in subject if any
+    const userName = user.name || user.email.split('@')[0];
+    subject = subject
+      .replace(/\{\{orderId\}\}/g, order._id.toString())
+      .replace(/\{\{userName\}\}/g, userName)
+      .replace(/\{\{status\}\}/g, order.orderStatus)
+      .replace(/\{\{totalAmount\}\}/g, `₹${order.totalAmount.toFixed(2)}`);
 
     const sent = await emailService.sendOrderEmail(
       user.email,
       { subject, body },
       {
         orderId: order._id.toString(),
-        userName: user.email.split('@')[0],
+        userName: userName,
         status: order.orderStatus,
         products: order.products.map((p: any) => ({
           name: p.name,

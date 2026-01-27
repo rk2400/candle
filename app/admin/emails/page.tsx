@@ -12,6 +12,7 @@ const TEMPLATE_TYPES = [
   { value: 'ORDER_PACKED', label: 'Order Packed' },
   { value: 'ORDER_SHIPPED', label: 'Order Shipped' },
   { value: 'ORDER_DELIVERED', label: 'Order Delivered' },
+  { value: 'ORDER_CANCELLED', label: 'Order Cancelled' },
 ];
 
 const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
@@ -64,6 +65,20 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
       {{products}}
       <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
       <p>Thank you for shopping with LittleFlame! We hope you love your candles.</p>
+    `,
+  },
+  ORDER_CANCELLED: {
+    subject: 'Order Cancelled - LittleFlame',
+    body: `
+      <h2>Hello {{userName}}!</h2>
+      <p>We're sorry to inform you that your order has been cancelled.</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Status:</strong> {{status}}</p>
+      <h3>Order Summary:</h3>
+      {{products}}
+      <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+      <p>If you have any questions or concerns, please contact our support team.</p>
+      <p>Thank you for your understanding.</p>
     `,
   },
 };
@@ -140,7 +155,7 @@ export default function AdminEmailsPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-1">
-            <div className="card">
+            <div className="card p-6">
               <h2 className="font-semibold mb-4">Template Types</h2>
               <div className="space-y-2">
                 {TEMPLATE_TYPES.map((type) => (
@@ -161,7 +176,7 @@ export default function AdminEmailsPage() {
           </div>
 
           <div className="lg:col-span-3">
-            <div className="card">
+            <div className="card p-6">
               <h2 className="text-2xl font-bold mb-6">
                 {TEMPLATE_TYPES.find((t) => t.value === selectedType)?.label}
               </h2>
