@@ -66,6 +66,32 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link href="/admin/products" className="card p-6 hover:shadow-lg transition-shadow hover:bg-stone-50">
+              <div className="text-3xl mb-3">📦</div>
+              <h3 className="text-lg font-semibold mb-2">Products</h3>
+              <p className="text-sm text-gray-600">Manage product catalog</p>
+            </Link>
+            <Link href="/admin/orders" className="card p-6 hover:shadow-lg transition-shadow hover:bg-stone-50">
+              <div className="text-3xl mb-3">📋</div>
+              <h3 className="text-lg font-semibold mb-2">Orders</h3>
+              <p className="text-sm text-gray-600">View and update orders</p>
+            </Link>
+            <Link href="/admin/users" className="card p-6 hover:shadow-lg transition-shadow hover:bg-stone-50">
+              <div className="text-3xl mb-3">👥</div>
+              <h3 className="text-lg font-semibold mb-2">Users</h3>
+              <p className="text-sm text-gray-600">Manage customers</p>
+            </Link>
+            <Link href="/admin/coupons" className="card p-6 hover:shadow-lg transition-shadow hover:bg-stone-50">
+              <div className="text-3xl mb-3">🎟️</div>
+              <h3 className="text-lg font-semibold mb-2">Coupons</h3>
+              <p className="text-sm text-gray-600">Create and manage coupons</p>
+            </Link>
+          </div>
+        </div>
+
         {stats && stats.ordersByStatus && (
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">Orders by Status</h2>
