@@ -33,7 +33,7 @@ async function handler(req: AuthRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    if (order.paymentStatus === 'COMPLETED') {
+    if (order.paymentStatus === 'PAID') {
       return NextResponse.json({ error: 'Order already paid' }, { status: 400 });
     }
 
@@ -55,7 +55,7 @@ async function handler(req: AuthRequest) {
     // Mock payment verification - in production, verify with payment gateway
     // For now, we'll simulate successful payment
     const { paymentConfig } = await import('@/lib/config');
-    order.paymentStatus = 'COMPLETED';
+    order.paymentStatus = 'PAID';
     order.paymentId = paymentId || razorpay_payment_id || `${paymentConfig.merchantId}_${Date.now()}`;
     await order.save();
 

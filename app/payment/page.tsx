@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/lib/contexts/UserContext';
@@ -12,7 +12,7 @@ import { generateUPIString, generateQRCodeURL } from '@/lib/upi';
 const upiId = process.env.NEXT_PUBLIC_UPI_ID || 'merchant@upi';
 const upiPayeeName = process.env.NEXT_PUBLIC_UPI_PAYEE_NAME || 'LittleFlame';
 
-export default function PaymentVerificationPage() {
+function PaymentVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useUser();
@@ -270,5 +270,17 @@ export default function PaymentVerificationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentVerificationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    }>
+      <PaymentVerificationContent />
+    </Suspense>
   );
 }

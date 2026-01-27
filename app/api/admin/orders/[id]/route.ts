@@ -40,7 +40,7 @@ async function handler(
       await order.save();
 
       // Send email if status changed
-      if (oldStatus !== orderStatus && order.paymentStatus === 'COMPLETED') {
+      if (oldStatus !== orderStatus && order.paymentStatus === 'PAID') {
         const user = await User.findById(order.userId);
         if (user) {
           let templateType: any = 'ORDER_CREATED';

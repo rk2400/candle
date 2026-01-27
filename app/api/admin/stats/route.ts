@@ -12,7 +12,7 @@ export const GET = withAdminAuth(async (req) => {
     const [totalOrders, totalRevenue, totalProducts, totalUsers] = await Promise.all([
       Order.countDocuments(),
       Order.aggregate([
-        { $match: { paymentStatus: 'COMPLETED' } },
+        { $match: { paymentStatus: 'PAID' } },
         { $group: { _id: null, total: { $sum: '$totalAmount' } } },
       ]),
       Product.countDocuments({ status: 'active' }),
