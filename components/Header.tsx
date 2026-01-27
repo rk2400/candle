@@ -22,6 +22,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [accountOpen, setAccountOpen] = useState(false);
 
   const handleLogout = async () => {
     clearCart();
@@ -148,19 +149,30 @@ export default function Header() {
                         
                         <button
                            onClick={handleLogout}
-                           className="text-sm font-medium text-stone-400 hover:text-red-500 transition-colors"
+                           className="hidden md:inline text-sm font-medium text-stone-400 hover:text-red-500 transition-colors"
                         >
                           Sign Out
                         </button>
                       </>
                     ) : (
                       <>
-                        <Link href="/login" className="text-sm font-medium text-stone-600 hover:text-primary-600 transition-colors">
-                          Log In
-                        </Link>
-                        <Link href="/signup" className="btn btn-primary text-sm px-5 py-2">
-                          Sign Up
-                        </Link>
+                        <div className="hidden md:flex items-center gap-3">
+                          <Link href="/login" className="text-sm font-medium text-stone-600 hover:text-primary-600 transition-colors">
+                            Log In
+                          </Link>
+                          <Link href="/signup" className="btn btn-primary text-sm px-5 py-2">
+                            Sign Up
+                          </Link>
+                        </div>
+                        <button
+                          className="md:hidden w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                          onClick={() => setAccountOpen(!accountOpen)}
+                          aria-label="Account"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </button>
                       </>
                     )}
                   </div>
@@ -169,13 +181,30 @@ export default function Header() {
             </div>
           </div>
 
-        {open && (
+        {(open || accountOpen) && (
           <div className="md:hidden border-t border-stone-100 bg-white py-4 animate-fade-in">
             <nav className="flex flex-col gap-1 px-4">
               <Link href="/" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Home</Link>
               <Link href="/products" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Shop</Link>
               <Link href="/about" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Our Story</Link>
               <Link href="/contact" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Contact</Link>
+              <div className="border-t border-stone-100 my-2"></div>
+              {user ? (
+                <>
+                  <Link href="/profile" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Account</Link>
+                  <button
+                    onClick={() => { setAccountOpen(false); handleLogout(); }}
+                    className="block text-left w-full px-4 py-3 rounded-lg hover:bg-stone-50 text-red-600 font-medium"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Login</Link>
+                  <Link href="/signup" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Sign Up</Link>
+                </>
+              )}
             </nav>
           </div>
         )}

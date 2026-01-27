@@ -172,7 +172,13 @@ function PaymentVerificationContent() {
     <div className="min-h-screen bg-stone-50">
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">Complete Your Payment</h1>
-        <p className="text-gray-600 mb-8">Order ID: <span className="font-mono font-bold">{order._id}</span></p>
+        <p className="text-gray-600">Order ID: <span className="font-mono font-bold">{order._id}</span></p>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 mb-8">
+          <h2 className="text-sm font-bold text-amber-900 mb-2">A quick note from a small business</h2>
+          <p className="text-amber-900 text-sm">
+            We are in our early stage, so payment verification is manual. Please pay via UPI in Step 1 and then confirm your UPI reference number in Step 2. Your support means a lot—thank you for helping us grow.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* Left: UPI QR Code */}

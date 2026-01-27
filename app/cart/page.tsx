@@ -21,6 +21,7 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [showCoupon, setShowCoupon] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -231,21 +232,30 @@ export default function CartPage() {
                   <span>₹{getTotal()}</span>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="input flex-1 h-10 text-sm"
-                      placeholder="Enter promo code"
-                    />
+                  {!showCoupon ? (
                     <button
-                      onClick={handleApplyCoupon}
-                      disabled={validatingCoupon || items.length === 0}
-                      className="btn btn-secondary h-10 px-4 text-sm"
+                      onClick={() => setShowCoupon(true)}
+                      className="text-sm text-primary-600 hover:text-primary-700 underline"
                     >
-                      {validatingCoupon ? 'Applying...' : 'Apply'}
+                      Have a coupon?
                     </button>
-                  </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="input flex-1 h-10 text-sm"
+                        placeholder="Enter promo code"
+                      />
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={validatingCoupon || items.length === 0}
+                        className="btn btn-secondary h-10 px-4 text-sm"
+                      >
+                        {validatingCoupon ? 'Applying...' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-green-700">
                       <span>Discount</span>

@@ -25,6 +25,9 @@ export async function getProductsFromDb(opts: GetProductsOptions = {}) {
       'Woody': 'woody',
       'Fresh': 'fresh',
       'Seasonal': 'seasonal',
+      'Seasonal Scents': 'seasonal',
+      'Signature Series': 'signature',
+      'Gift Sets': 'gift-sets',
     };
     const normalizedCategory = categoryMap[category] || category.toLowerCase();
     query.category = normalizedCategory;

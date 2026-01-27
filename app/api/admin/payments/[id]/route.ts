@@ -46,7 +46,7 @@ async function handler(req: AuthRequest, { params }: { params: { id: string } })
         order.adminPaymentNote = adminNote || '';
         await order.save();
 
-        // Send both PAYMENT_CONFIRMED and ORDER_CONFIRMED emails to user
+        // Send both PAYMENT_CONFIRMED and ORDER_CONFIRMED emails to user (with robust fallbacks)
         if (userEmail) {
           try {
             // Fetch both email templates
@@ -77,6 +77,13 @@ async function handler(req: AuthRequest, { params }: { params: { id: string } })
                   totalAmount: order.totalAmount,
                 }
               );
+            } else {
+              // Fallback to a built-in payment approved notification
+              await emailService.sendPaymentNotification(userEmail, 'approved', {
+                orderId: order._id.toString(),
+                userName,
+                totalAmount: order.totalAmount,
+              });
             }
 
             // Email 2: Order Confirmed
@@ -92,6 +99,45 @@ async function handler(req: AuthRequest, { params }: { params: { id: string } })
               await emailService.sendOrderEmail(
                 userEmail,
                 { subject: orderSubject, body: orderBody },
+                {
+                  orderId: order._id.toString(),
+                  userName,
+                  status: order.orderStatus,
+                  products: order.products.map((p: any) => ({
+                    name: p.name,
+                    quantity: p.quantity,
+                    price: p.price * p.quantity,
+                  })),
+                  totalAmount: order.totalAmount,
+                }
+              );
+            } else {
+              // Fallback to ORDER_CREATED template or default body used in payment gateway verification
+              const createdTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
+              let subject =
+                createdTemplate?.subject ?? 'Order Confirmed - LittleFlame';
+              let emailBody =
+                createdTemplate?.body ??
+                `
+                  <h2>Hello {{userName}}!</h2>
+                  <p>Your order has been confirmed!</p>
+                  <p><strong>Order ID:</strong> {{orderId}}</p>
+                  <p><strong>Status:</strong> {{status}}</p>
+                  <h3>Order Summary:</h3>
+                  {{products}}
+                  <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
+                  <p>Thank you for your purchase! We'll keep you updated on your order status.</p>
+                `;
+
+              subject = subject
+                .replace(/\{\{orderId\}\}/g, order._id.toString())
+                .replace(/\{\{userName\}\}/g, userName)
+                .replace(/\{\{status\}\}/g, order.orderStatus)
+                .replace(/\{\{totalAmount\}\}/g, `₹${order.totalAmount.toFixed(2)}`);
+
+              await emailService.sendOrderEmail(
+                userEmail,
+                { subject, body: emailBody },
                 {
                   orderId: order._id.toString(),
                   userName,

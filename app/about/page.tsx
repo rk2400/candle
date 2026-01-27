@@ -72,6 +72,14 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Quotes */}
+        <div className="max-w-4xl mx-auto text-center mb-24">
+          <blockquote className="text-2xl md:text-3xl font-serif text-stone-800 leading-relaxed">
+            “From a small studio and big hopes—every flame carries our promise to bring warmth, calm, and a little wonder to your day.”
+          </blockquote>
+          <p className="mt-4 text-stone-500">— The LittleFlame Team</p>
+        </div>
+
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 h-96 md:h-[600px]">
           <div className="h-full rounded-2xl overflow-hidden relative group">

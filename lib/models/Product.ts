@@ -7,7 +7,7 @@ export interface IProduct extends Document {
   images: string[];
   status: 'active' | 'inactive';
   stock: number;
-  category: 'floral' | 'fresh' | 'seasonal' | 'woody' | 'other';
+  category: 'floral' | 'fresh' | 'seasonal' | 'woody' | 'signature' | 'gift-sets' | 'other';
   isBestSeller: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -46,7 +46,7 @@ const ProductSchema: Schema = new Schema(
     },
     category: {
       type: String,
-      enum: ['floral', 'fresh', 'seasonal', 'woody', 'other'],
+      enum: ['floral', 'fresh', 'seasonal', 'woody', 'signature', 'gift-sets', 'other'],
       default: 'other',
       index: true,
     },

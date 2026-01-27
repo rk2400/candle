@@ -57,7 +57,7 @@ export default async function HomePage() {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Collection 1 */}
-          <div className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
+          <Link href="/products?category=Floral" className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
             <img 
               src="https://images.unsplash.com/photo-1603006905003-be475563bc59?q=80&w=800&auto=format&fit=crop" 
               alt="Floral Collection" 
@@ -69,10 +69,10 @@ export default async function HomePage() {
               <p className="text-white/80 text-sm mb-4">Gardenia, Rose, & Jasmine</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Floral</span>
             </div>
-          </div>
+          </Link>
 
           {/* Collection 2 */}
-          <div className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
+          <Link href="/products?category=Woody" className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
             <img 
               src="https://images.unsplash.com/photo-1577025728734-7ec67bdb97d0?q=80&w=2950&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Woody Collection" 
@@ -84,10 +84,10 @@ export default async function HomePage() {
               <p className="text-white/80 text-sm mb-4">Sandalwood, Pine, & Amber</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Earthy</span>
             </div>
-          </div>
+          </Link>
 
           {/* Collection 3 */}
-          <div className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
+          <Link href="/products?category=Fresh" className="group relative h-96 overflow-hidden rounded-xl cursor-pointer">
             <img 
               src="https://images.unsplash.com/photo-1612293905607-b003de9e54fb?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
               alt="Fresh Collection" 
@@ -99,7 +99,7 @@ export default async function HomePage() {
               <p className="text-white/80 text-sm mb-4">Linen, Sea Salt, & Citrus</p>
               <span className="inline-block border-b border-white pb-1 text-sm font-medium">Shop Fresh</span>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 

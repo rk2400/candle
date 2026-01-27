@@ -16,7 +16,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: { c
   const currentCategory = searchParams.category || 'All';
   const searchTerm = searchParams.search;
 
-  const categories = ['All Scents', 'Floral', 'Woody', 'Fresh', 'Seasonal'];
+  const categories = ['All Scents', 'Floral', 'Woody', 'Fresh', 'Seasonal', 'Signature Series', 'Gift Sets'];
 
   return (
     <div className="bg-stone-50 min-h-screen">
