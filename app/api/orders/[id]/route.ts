@@ -19,10 +19,12 @@ async function handler(req: AuthRequest, ctx?: any) {
       return NextResponse.json({ error: 'Order ID missing' }, { status: 400 });
     }
 
-    const order = await Order.findOne({ _id: id, userId: req.user.userId }).populate(
-      'products.productId',
-      'name images description'
-    );
+    const order = await Order.findOne({ _id: id, userId: req.user.userId })
+      .populate({
+        path: 'products.productId',
+        select: 'name images description',
+        model: Product,
+      });
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });

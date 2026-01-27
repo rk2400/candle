@@ -16,7 +16,11 @@ async function handler(req: AuthRequest) {
       userId: req.user.userId
     })
       .sort({ createdAt: -1 })
-      .populate('products.productId', 'name images');
+      .populate({
+        path: 'products.productId',
+        select: 'name images',
+        model: Product,
+      });
 
     return NextResponse.json({ orders });
   } catch (error: any) {

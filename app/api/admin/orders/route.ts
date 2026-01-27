@@ -11,7 +11,11 @@ export const GET = withAdminAuth(async (req) => {
     const orders = await Order.find()
       .sort({ createdAt: -1 })
       .populate('userId', 'name email phone')
-      .populate('products.productId', 'name images');
+      .populate({
+        path: 'products.productId',
+        select: 'name images',
+        model: Product,
+      });
 
     return NextResponse.json({ orders });
   } catch (error: any) {
