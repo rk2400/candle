@@ -140,6 +140,68 @@ class EmailService {
       html: styledHtml,
     });
   }
+
+  async sendPaymentNotification(
+    email: string,
+    status: 'submitted' | 'approved' | 'rejected',
+    variables: {
+      orderId: string;
+      userName: string;
+      totalAmount: number;
+      rejectionReason?: string;
+    }
+  ): Promise<boolean> {
+    let subject = '';
+    let html = '';
+
+    if (status === 'submitted') {
+      subject = `Payment Received - Order #${variables.orderId}`;
+      html = `
+        <p>Hi ${variables.userName},</p>
+        <p>We have received your payment for order <strong>#${variables.orderId}</strong></p>
+        <p><strong>Amount: ₹${variables.totalAmount.toFixed(2)}</strong></p>
+        <p>Your payment is under verification. We'll confirm the payment within 24 hours and send you an update.</p>
+        <p style="margin-top: 20px; color: #666; font-size: 12px;">Thank you for your patience!</p>
+      `;
+    } else if (status === 'approved') {
+      subject = `Payment Confirmed! - Order #${variables.orderId}`;
+      html = `
+        <p>Hi ${variables.userName},</p>
+        <p>Great news! We have confirmed your payment for order <strong>#${variables.orderId}</strong></p>
+        <p><strong>Amount: ₹${variables.totalAmount.toFixed(2)}</strong></p>
+        <p>Your order is now confirmed and will be shipped soon. You'll receive tracking details shortly.</p>
+        <p style="margin-top: 20px; color: #666; font-size: 12px;">Thank you for shopping with ${appConfig.name}! 🕯️</p>
+      `;
+    } else {
+      // rejected
+      subject = `Payment Could Not Be Verified - Order #${variables.orderId}`;
+      html = `
+        <p>Hi ${variables.userName},</p>
+        <p>We could not verify the payment for order <strong>#${variables.orderId}</strong></p>
+        ${variables.rejectionReason ? `<p><strong>Reason:</strong> ${variables.rejectionReason}</p>` : ''}
+        <p>The amount <strong>₹${variables.totalAmount.toFixed(2)}</strong> is available for you to pay again.</p>
+        <p>Please contact our support team if you have any questions.</p>
+        <p style="margin-top: 20px; color: #666; font-size: 12px;">Thank you for your understanding.</p>
+      `;
+    }
+
+    const styledHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">${appConfig.name}</h1>
+        </div>
+        <div style="background: white; padding: 30px; border: 1px solid #eee; border-top: none; border-radius: 0 0 10px 10px;">
+          ${html}
+        </div>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: email,
+      subject,
+      html: styledHtml,
+    });
+  }
 }
 
 export const emailService = new EmailService();

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/lib/contexts/CartContext';
 import { useUser } from '@/lib/contexts/UserContext';
-import { checkout, verifyPayment, getCurrentUser, saveAddress, AddressPayload, validateCoupon } from '@/lib/api-client';
+import { checkout, getCurrentUser, saveAddress, AddressPayload, validateCoupon } from '@/lib/api-client';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 
@@ -15,6 +15,7 @@ export default function CartPage() {
   const [processing, setProcessing] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [editingAddress, setEditingAddress] = useState(false);
+  const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   const [address, setAddress] = useState<AddressPayload>({ street: '', city: '', state: '', pincode: '', full: '' });
   const [addrSaving, setAddrSaving] = useState(false);
   const [couponCode, setCouponCode] = useState('');
@@ -119,6 +120,12 @@ export default function CartPage() {
       return;
     }
 
+    // Show confirmation dialog instead of directly processing
+    setShowCheckoutConfirm(true);
+  }
+
+  async function confirmCheckout() {
+    setShowCheckoutConfirm(false);
     setProcessing(true);
     try {
       const current = currentUser || (await getCurrentUser());
@@ -131,70 +138,10 @@ export default function CartPage() {
 
       const order = await checkout(items, couponCode.trim() || undefined);
       
-      // Check for Razorpay Key availability
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-      const isTestMode = !razorpayKey || razorpayKey.includes('placeholder') || razorpayKey.includes('rzp_test_xxxxxxxxxxxxx');
-
-      // If in Test Mode or No Key, Simulate Checkout
-      if (isTestMode) {
-        toast.loading('Simulating Payment (Test Mode)...', { duration: 2000 });
-        
-        // Wait 2 seconds to simulate processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        try {
-          // Use mock values for verification
-          await verifyPayment({
-            orderId: order.id,
-            razorpay_order_id: order.razorpayOrderId || 'mock_order_id',
-            razorpay_payment_id: 'mock_payment_id_' + Date.now(),
-            razorpay_signature: 'mock_signature',
-            is_mock: true // Flag to tell backend to skip signature check
-          });
-          
-          clearCart();
-          toast.success('Order placed successfully! (Test Mode)');
-          router.push('/orders?placed=1');
-          return;
-        } catch (error: any) {
-           toast.error('Simulation failed: ' + error.message);
-           return;
-        }
-      }
-
-      const options = {
-        key: razorpayKey,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'LittleFlame',
-        description: 'Order Payment',
-        order_id: order.razorpayOrderId,
-        handler: async function (response: any) {
-          try {
-            await verifyPayment({
-              orderId: order.id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            clearCart();
-            toast.success('Order placed successfully!');
-            router.push('/orders?placed=1');
-          } catch (error) {
-            toast.error('Payment verification failed');
-          }
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
-        theme: {
-          color: '#a77f71', // Primary color
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
+      // Clear cart and redirect to payment page
+      clearCart();
+      toast.success('Order created! Proceeding to payment...');
+      router.push(`/payment?orderId=${order.id}`);
     } catch (error: any) {
       toast.error(error.message || 'Checkout failed');
     } finally {
@@ -406,6 +353,51 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Confirmation Modal */}
+      {showCheckoutConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="p-8">
+              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <h2 className="text-2xl font-serif font-bold text-stone-900 mb-3">
+                Confirm Your Order
+              </h2>
+              
+              <p className="text-stone-600 mb-6 leading-relaxed">
+                You are about to place an order for <span className="font-semibold">₹{Math.max(0, getTotal() - discountAmount)}</span>. Your order will be confirmed after the payment is verified.
+              </p>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <p className="text-sm text-blue-900">
+                  <span className="font-semibold">Note:</span> Payment verification may take up to 24 hours. You'll receive a confirmation email once verified.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCheckoutConfirm(false)}
+                  className="flex-1 btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmCheckout}
+                  disabled={processing}
+                  className="flex-1 btn btn-primary"
+                >
+                  {processing ? 'Processing...' : 'Continue to Payment'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

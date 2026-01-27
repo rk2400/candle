@@ -159,14 +159,36 @@ export default function OrderDetailPage() {
               </div>
               
               <div className="mt-4 pt-4 border-t border-stone-200">
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center text-sm mb-3">
                   <span className="text-stone-500">Payment Status</span>
-                  <span className={`font-medium ${
-                    order.paymentStatus === 'COMPLETED' ? 'text-green-600' : 'text-amber-600'
+                  <span className={`font-medium px-2 py-1 rounded text-xs ${
+                    order.paymentStatus === 'PAID' ? 'bg-green-50 text-green-700 border border-green-200' :
+                    order.paymentStatus === 'PAYMENT_SUBMITTED' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                    order.paymentStatus === 'PAYMENT_PENDING' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                    'bg-red-50 text-red-700 border border-red-200'
                   }`}>
-                    {order.paymentStatus}
+                    {order.paymentStatus === 'PAID' ? '✓ Paid' :
+                     order.paymentStatus === 'PAYMENT_SUBMITTED' ? '⏳ Under Verification' :
+                     order.paymentStatus === 'PAYMENT_PENDING' ? '⚠ Payment Pending' :
+                     '✗ Payment Rejected'}
                   </span>
                 </div>
+                {order.paymentStatus === 'PAYMENT_PENDING' && (
+                  <button
+                    onClick={() => router.push(`/payment?orderId=${order._id}`)}
+                    className="w-full mt-3 btn btn-primary"
+                  >
+                    Complete Payment
+                  </button>
+                )}
+                {order.paymentStatus === 'PAYMENT_REJECTED' && (
+                  <button
+                    onClick={() => router.push(`/payment?orderId=${order._id}`)}
+                    className="w-full mt-3 btn btn-primary"
+                  >
+                    Retry Payment
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -12,8 +12,7 @@ async function handler(req: AuthRequest) {
     }
 
     const orders = await Order.find({ 
-      userId: req.user.userId,
-      paymentStatus: { $ne: 'PENDING' }
+      userId: req.user.userId
     })
       .sort({ createdAt: -1 })
       .populate('products.productId', 'name images');

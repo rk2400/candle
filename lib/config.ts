@@ -89,6 +89,9 @@ export const appConfig = {
 export const paymentConfig = {
   merchantId: getEnvVar('UPI_MERCHANT_ID', 'mock_merchant_123'),
   testMode: getEnvVarAsBoolean('UPI_TEST_MODE', true),
+  // UPI Configuration
+  upiId: getEnvVar('NEXT_PUBLIC_UPI_ID', 'merchant@upi'),
+  upiPayeeName: getEnvVar('NEXT_PUBLIC_UPI_PAYEE_NAME', 'LittleFlame'),
   // Future: Add Razorpay/Cashfree keys here
   razorpayKeyId: getEnvVar('RAZORPAY_KEY_ID', ''),
   razorpayKeySecret: getEnvVar('RAZORPAY_KEY_SECRET', ''),

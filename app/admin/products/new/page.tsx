@@ -16,6 +16,7 @@ export default function NewProductPage() {
     images: '',
     status: 'active' as 'active' | 'inactive',
     stock: '0',
+    category: 'other' as 'floral' | 'fresh' | 'seasonal' | 'woody' | 'other',
   });
   const [loading, setLoading] = useState(false);
 
@@ -100,6 +101,20 @@ export default function NewProductPage() {
               placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Category</label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+              className="input"
+            >
+              <option value="floral">Floral</option>
+              <option value="fresh">Fresh</option>
+              <option value="seasonal">Seasonal</option>
+              <option value="woody">Woody</option>
+              <option value="other">Other</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Status</label>

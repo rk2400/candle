@@ -331,3 +331,44 @@ export async function deleteCoupon(id: string) {
   if (!res.ok) throw new Error(data.error || 'Failed to delete coupon');
   return data;
 }
+// Payment APIs
+export async function submitPayment(payload: {
+  orderId: string;
+  upiReferenceNumber: string;
+  paymentScreenshot?: string;
+}) {
+  const res = await fetch(`${API_URL}/api/payment/submit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to submit payment');
+  return data;
+}
+
+export async function getAdminPendingPayments() {
+  const res = await fetch(`${API_URL}/api/admin/payments`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch pending payments');
+  return data;
+}
+
+export async function verifyAdminPayment(id: string, payload: {
+  action: 'approve' | 'reject';
+  adminNote?: string;
+}) {
+  const res = await fetch(`${API_URL}/api/admin/payments/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to verify payment');
+  return data;
+}

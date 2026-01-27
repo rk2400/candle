@@ -5,7 +5,6 @@ import Order from '@/lib/models/Order';
 import User from '@/lib/models/User';
 import { withAuth, AuthRequest } from '@/lib/middleware';
 import { checkoutSchema } from '@/lib/validations';
-import Razorpay from 'razorpay';
 
 async function handler(req: AuthRequest) {
   try {
@@ -90,8 +89,9 @@ async function handler(req: AuthRequest) {
     }
     const totalAmount = subtotalAmount - discountAmount;
 
-    // Create order
-    // Fetch user's saved address to snapshot with the order
+    // Create order with PAYMENT_PENDING status
+    // Stock is reserved at this point
+    // User must submit payment via UPI for order to proceed
     const user = await User.findById(req.user.userId).lean();
     const orderPayload: any = {
       userId: req.user.userId,
@@ -100,7 +100,7 @@ async function handler(req: AuthRequest) {
       subtotalAmount,
       discountAmount,
       couponCode: couponCode || undefined,
-      paymentStatus: 'PENDING',
+      paymentStatus: 'PAYMENT_PENDING', // Semi-manual UPI - pending user submission
       orderStatus: 'CREATED',
     };
 
@@ -116,39 +116,17 @@ async function handler(req: AuthRequest) {
 
     const order = await Order.create(orderPayload);
 
-    // Create Razorpay Order
-    let razorpayOrderId = '';
-    // Use env vars or defaults for dev
-    const key_id = process.env.RAZORPAY_KEY_ID;
-    const key_secret = process.env.RAZORPAY_KEY_SECRET;
-
-    if (key_id && key_secret) {
-      const razorpay = new Razorpay({
-        key_id,
-        key_secret,
-      });
-
-      const razorpayOrder = await razorpay.orders.create({
-        amount: Math.round(totalAmount * 100), // amount in paise
-        currency: 'INR',
-        receipt: order._id.toString(),
-      });
-      razorpayOrderId = razorpayOrder.id;
-    } else {
-      // Fallback/Mock for development if keys missing
-      console.warn('Razorpay keys missing, using mock order ID');
-      razorpayOrderId = `order_mock_${order._id.toString()}`;
-    }
-
+    // Return order details for payment page
+    // No Razorpay order needed - using UPI directly
     return NextResponse.json({
       success: true,
       order: {
         id: order._id,
-        razorpayOrderId,
         totalAmount: order.totalAmount,
-        amount: Math.round(totalAmount * 100),
-        currency: 'INR',
+        subtotalAmount: order.subtotalAmount,
+        discountAmount: order.discountAmount,
         products: order.products,
+        paymentStatus: order.paymentStatus,
       },
     });
   } catch (error: any) {

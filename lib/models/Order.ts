@@ -9,7 +9,7 @@ export interface IOrderItem {
 }
 
 export type OrderStatus = 'CREATED' | 'PACKED' | 'SHIPPED' | 'DELIVERED';
-export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type PaymentStatus = 'PAYMENT_PENDING' | 'PAYMENT_SUBMITTED' | 'PAID' | 'PAYMENT_REJECTED';
 
 export interface IOrder extends Document {
   userId: mongoose.Types.ObjectId;
@@ -28,6 +28,11 @@ export interface IOrder extends Document {
     pincode?: string;
   };
   paymentId?: string;
+  // Semi-manual UPI payment fields
+  upiReferenceNumber?: string;
+  paymentScreenshot?: string;
+  paymentSubmittedAt?: Date;
+  adminPaymentNote?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -89,8 +94,8 @@ const OrderSchema: Schema = new Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['PENDING', 'COMPLETED', 'FAILED'],
-      default: 'PENDING',
+      enum: ['PAYMENT_PENDING', 'PAYMENT_SUBMITTED', 'PAID', 'PAYMENT_REJECTED'],
+      default: 'PAYMENT_PENDING',
     },
     orderStatus: {
       type: String,
@@ -99,6 +104,20 @@ const OrderSchema: Schema = new Schema(
     },
     paymentId: {
       type: String,
+    },
+    upiReferenceNumber: {
+      type: String,
+      trim: true,
+    },
+    paymentScreenshot: {
+      type: String,
+    },
+    paymentSubmittedAt: {
+      type: Date,
+    },
+    adminPaymentNote: {
+      type: String,
+      trim: true,
     },
     address: {
       full: { type: String, trim: true, default: '' },
