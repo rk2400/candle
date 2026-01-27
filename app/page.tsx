@@ -170,7 +170,7 @@ export default async function HomePage() {
              "We believe in the power of scent to <br className="hidden md:block" /> transform a space and uplift the spirit."
            </h2>
            <p className="max-w-2xl mx-auto text-lg text-stone-300 mb-10 leading-relaxed">
-             AuraFarm began with a simple mission: to create candles that are as kind to the planet as they are delightful to the senses. Every candle is a labor of love, designed to bring a touch of magic to your daily routine.
+             LittleFlame began with a simple mission: to create candles that are as kind to the planet as they are delightful to the senses. Every candle is a labor of love, designed to bring a touch of magic to your daily routine.
            </p>
            <Link href="/about" className="btn btn-primary bg-white text-stone-900 hover:bg-stone-100 border-none inline-flex">
              Read Our Full Story

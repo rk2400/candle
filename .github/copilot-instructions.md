@@ -1,4 +1,4 @@
-# Copilot Instructions — AuraFarm
+# Copilot Instructions — LittleFlame
 
 Purpose: give an AI coding agent the minimal, actionable context to be productive in this repo.
 

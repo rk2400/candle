@@ -2,7 +2,7 @@
 
 ## Admin Authorization
 
-AuraFarm uses a simple but secure admin authorization system based on email matching.
+LittleFlame uses a simple but secure admin authorization system based on email matching.
 
 ### How It Works
 
@@ -22,7 +22,7 @@ AuraFarm uses a simple but secure admin authorization system based on email matc
 
 1. **Set Admin Email in Environment**:
    ```env
-   ADMIN_EMAIL=admin@aurafarm.com
+   ADMIN_EMAIL=admin@littleflame.com
    ```
 
 2. **Create Admin Account**:

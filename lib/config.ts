@@ -38,7 +38,7 @@ function getEnvVarAsBoolean(key: string, defaultValue?: boolean): boolean {
 
 // Database Configuration
 export const dbConfig = {
-  uri: getEnvVar('MONGODB_URI', 'mongodb://localhost:27017/aurafarm'),
+  uri: getEnvVar('MONGODB_URI', 'mongodb://localhost:27017/littleflame'),
 } as const;
 
 // Authentication Configuration
@@ -51,7 +51,7 @@ export const authConfig = {
 
 // Admin Configuration
 export const adminConfig = {
-  email: getEnvVar('ADMIN_EMAIL', 'admin@aurafarm.com'),
+  email: getEnvVar('ADMIN_EMAIL', 'admin@littleflame.com'),
   password: getEnvVar('ADMIN_PASSWORD', 'ChangeThisPassword123!'),
 } as const;
 
@@ -61,7 +61,7 @@ export const emailConfig = {
   port: getEnvVarAsNumber('EMAIL_PORT', 587),
   user: getEnvVar('EMAIL_USER', ''),
   pass: getEnvVar('EMAIL_PASS', ''),
-  from: getEnvVar('EMAIL_FROM', 'noreply@aurafarm.com'),
+  from: getEnvVar('EMAIL_FROM', 'noreply@littleflame.com'),
   // Check if email is configured (all required fields present)
   isConfigured: (): boolean => {
     return !!(
@@ -74,7 +74,7 @@ export const emailConfig = {
 
 // App Configuration
 export const appConfig = {
-  name: getEnvVar('APP_NAME', 'AuraFarm'),
+  name: getEnvVar('APP_NAME', 'LittleFlame'),
   url: getEnvVar('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'),
   nodeEnv: getEnvVar('NODE_ENV', 'development'),
   isProduction: (): boolean => {

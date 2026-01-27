@@ -1,4 +1,4 @@
-# AuraFarm - Ecommerce Platform for Candles
+# LittleFlame - Ecommerce Platform for Candles
 
 A production-ready ecommerce web application built for a small Indian startup selling candles. Built with Next.js, TypeScript, MongoDB, and Tailwind CSS.
 
@@ -34,7 +34,7 @@ A production-ready ecommerce web application built for a small Indian startup se
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd AuraFarm
+   cd LittleFlame
    ```
 
 2. **Install dependencies**
@@ -234,7 +234,7 @@ Similar process with Cashfree SDK. The architecture supports easy swapping of pa
 ## 📁 Project Structure
 
 ```
-AuraFarm/
+LittleFlame/
 ├── app/
 │   ├── api/              # API routes
 │   │   ├── auth/         # Authentication endpoints
@@ -317,9 +317,9 @@ This is a production MVP. For enhancements:
 
 ## 📄 License
 
-Proprietary - AuraFarm
+Proprietary - LittleFlame
 
 ---
 
-**Built with ❤️ for AuraFarm**
+**Built with ❤️ for LittleFlame**
 

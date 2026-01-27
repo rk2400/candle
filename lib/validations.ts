@@ -32,7 +32,8 @@ export const productSchema = z.object({
   images: z.array(z.string().url()).min(1, 'At least one image is required'),
   status: z.enum(['active', 'inactive']),
   stock: z.number().int().min(0, 'Stock must be non-negative'),
-  category: z.string().optional(),
+  category: z.enum(['floral', 'fresh', 'seasonal', 'woody', 'other']).optional(),
+  isBestSeller: z.boolean().optional(),
 });
 
 export const orderStatusSchema = z.object({
@@ -45,6 +46,18 @@ export const emailTemplateSchema = z.object({
   body: z.string().min(1, 'Body is required'),
 });
 
+export const couponSchema = z.object({
+  code: z.string().min(1).toUpperCase(),
+  type: z.enum(['percentage', 'flat']),
+  value: z.number().min(0),
+  active: z.boolean().optional(),
+  validFrom: z.union([z.string().datetime(), z.coerce.date()]).optional(),
+  validTo: z.union([z.string().datetime(), z.coerce.date()]).optional(),
+  minSubtotal: z.number().min(0).optional(),
+  maxDiscount: z.number().min(0).optional(),
+  usageLimit: z.number().int().min(0).optional(),
+});
+
 export const checkoutSchema = z.object({
   products: z.array(
     z.object({
@@ -52,5 +65,15 @@ export const checkoutSchema = z.object({
       quantity: z.number().int().positive(),
     })
   ),
+  couponCode: z.string().optional(),
 });
 
+export const applyCouponSchema = z.object({
+  code: z.string().min(1),
+  products: z.array(
+    z.object({
+      productId: z.string(),
+      quantity: z.number().int().positive(),
+    })
+  ),
+});

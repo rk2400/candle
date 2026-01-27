@@ -7,6 +7,8 @@ export interface IProduct extends Document {
   images: string[];
   status: 'active' | 'inactive';
   stock: number;
+  category: 'floral' | 'fresh' | 'seasonal' | 'woody' | 'other';
+  isBestSeller: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,7 +46,13 @@ const ProductSchema: Schema = new Schema(
     },
     category: {
       type: String,
-      default: 'Other',
+      enum: ['floral', 'fresh', 'seasonal', 'woody', 'other'],
+      default: 'other',
+      index: true,
+    },
+    isBestSeller: {
+      type: Boolean,
+      default: false,
       index: true,
     },
   },
@@ -56,4 +64,3 @@ const ProductSchema: Schema = new Schema(
 const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
 
 export default Product;
-

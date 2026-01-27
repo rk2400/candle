@@ -1,6 +1,6 @@
 # Environment Variables Setup Guide
 
-This document explains how to set up environment variables for AuraFarm.
+This document explains how to set up environment variables for LittleFlame.
 
 ## Quick Start
 
@@ -30,8 +30,8 @@ Next.js loads environment variables in this order (later files override earlier 
 
 ### Database
 - `MONGODB_URI` - MongoDB connection string
-  - Local: `mongodb://localhost:27017/aurafarm`
-  - Atlas: `mongodb+srv://user:pass@cluster.mongodb.net/aurafarm`
+  - Local: `mongodb://localhost:27017/littleflame`
+  - Atlas: `mongodb+srv://user:pass@cluster.mongodb.net/littleflame`
 
 ### Authentication
 - `JWT_SECRET` - Secret for signing JWT tokens
@@ -57,7 +57,7 @@ For production:
 - `EMAIL_FROM` - Sender email address
 
 ### Application
-- `APP_NAME` - Application name (default: "AuraFarm")
+- `APP_NAME` - Application name (default: "LittleFlame")
 - `NEXT_PUBLIC_APP_URL` - Public URL (default: "http://localhost:3000")
 - `NODE_ENV` - Environment (development/production)
 
@@ -126,14 +126,14 @@ npm run validate-env
 
 ```env
 # Database
-MONGODB_URI=mongodb://localhost:27017/aurafarm
+MONGODB_URI=mongodb://localhost:27017/littleflame
 
 # Auth
 JWT_SECRET=your-generated-secret-here
 OTP_EXPIRY_MINUTES=10
 
 # Admin
-ADMIN_EMAIL=admin@aurafarm.com
+ADMIN_EMAIL=admin@littleflame.com
 ADMIN_PASSWORD=SecurePassword123!
 
 # Email (optional - leave empty for mock mode)
@@ -141,10 +141,10 @@ EMAIL_HOST=
 EMAIL_PORT=587
 EMAIL_USER=
 EMAIL_PASS=
-EMAIL_FROM=noreply@aurafarm.com
+EMAIL_FROM=noreply@littleflame.com
 
 # App
-APP_NAME=AuraFarm
+APP_NAME=LittleFlame
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NODE_ENV=development
 

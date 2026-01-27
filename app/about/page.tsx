@@ -22,10 +22,10 @@ export default function AboutPage() {
         {/* Story Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-24">
           <div className="order-2 md:order-1">
-            <h2 className="text-3xl font-serif text-stone-900 mb-6">The AuraFarm Story</h2>
+            <h2 className="text-3xl font-serif text-stone-900 mb-6">The LittleFlame Story</h2>
             <div className="prose prose-stone text-lg text-stone-600 leading-relaxed space-y-6">
               <p>
-                AuraFarm began with a simple yet profound realization: the right scent has the power to transform a house into a home. 
+                LittleFlame began with a simple yet profound realization: the right scent has the power to transform a house into a home. 
                 What started as a personal passion for blending essential oils in a small kitchen has grown into a curated collection of 
                 artisanal candles, each designed to evoke specific memories and emotions.
               </p>

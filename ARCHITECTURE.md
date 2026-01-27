@@ -2,7 +2,7 @@
 
 ## System Overview
 
-AuraFarm is built as a full-stack Next.js application with a clear separation between frontend, API routes, and database layers. The architecture is designed to be scalable, secure, and easy to extend.
+LittleFlame is built as a full-stack Next.js application with a clear separation between frontend, API routes, and database layers. The architecture is designed to be scalable, secure, and easy to extend.
 
 ## Key Architecture Decisions
 

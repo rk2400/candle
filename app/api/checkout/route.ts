@@ -16,7 +16,8 @@ async function handler(req: AuthRequest) {
     }
 
     const body = await req.json();
-    const { products } = checkoutSchema.parse(body);
+    const parsed = checkoutSchema.parse(body);
+    const { products, couponCode } = parsed as any;
 
     // Fetch products and calculate total
     const productIds = products.map((p: any) => p.productId);
@@ -60,10 +61,34 @@ async function handler(req: AuthRequest) {
       });
     }
 
-    const totalAmount = orderItems.reduce(
+    const subtotalAmount = orderItems.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,
       0
     );
+    let discountAmount = 0;
+    if (couponCode && typeof couponCode === 'string' && couponCode.trim().length > 0) {
+      const { default: Coupon } = await import('@/lib/models/Coupon');
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+      if (coupon && coupon.active) {
+        const now = new Date();
+        const withinStart = !coupon.validFrom || now >= coupon.validFrom;
+        const withinEnd = !coupon.validTo || now <= coupon.validTo;
+        const notExceeded = typeof coupon.usageLimit !== 'number' || (coupon.usedCount ?? 0) < coupon.usageLimit;
+        const meetsMin = typeof coupon.minSubtotal !== 'number' || subtotalAmount >= coupon.minSubtotal;
+        if (withinStart && withinEnd && notExceeded && meetsMin) {
+          if (coupon.type === 'percentage') {
+            discountAmount = Math.floor((subtotalAmount * coupon.value) / 100);
+            if (typeof coupon.maxDiscount === 'number') {
+              discountAmount = Math.min(discountAmount, coupon.maxDiscount);
+            }
+          } else {
+            discountAmount = Math.floor(coupon.value);
+          }
+          discountAmount = Math.max(0, Math.min(discountAmount, subtotalAmount));
+        }
+      }
+    }
+    const totalAmount = subtotalAmount - discountAmount;
 
     // Create order
     // Fetch user's saved address to snapshot with the order
@@ -72,6 +97,9 @@ async function handler(req: AuthRequest) {
       userId: req.user.userId,
       products: orderItems,
       totalAmount,
+      subtotalAmount,
+      discountAmount,
+      couponCode: couponCode || undefined,
       paymentStatus: 'PENDING',
       orderStatus: 'CREATED',
     };
@@ -133,4 +161,3 @@ async function handler(req: AuthRequest) {
 }
 
 export const POST = withAuth(handler);
-

@@ -33,7 +33,7 @@ export default function AdminHeader() {
                 <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <Link href="/admin/dashboard" className="text-2xl font-bold text-primary-600">🕯️ AuraFarm Admin</Link>
+            <Link href="/admin/dashboard" className="text-2xl font-bold text-primary-600">🕯️ LittleFlame Admin</Link>
           </div>
 
           <nav className={`hidden md:flex gap-4 ${open ? 'block' : ''}`}>

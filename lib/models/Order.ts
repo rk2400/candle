@@ -14,6 +14,9 @@ export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
 export interface IOrder extends Document {
   userId: mongoose.Types.ObjectId;
   products: IOrderItem[];
+  subtotalAmount: number;
+  discountAmount: number;
+  couponCode?: string;
   totalAmount: number;
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
@@ -63,6 +66,21 @@ const OrderSchema: Schema = new Schema(
     products: {
       type: [OrderItemSchema],
       required: true,
+    },
+    subtotalAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    discountAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    couponCode: {
+      type: String,
+      trim: true,
     },
     totalAmount: {
       type: Number,

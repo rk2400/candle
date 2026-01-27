@@ -16,7 +16,7 @@ const TEMPLATE_TYPES = [
 
 const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
   ORDER_CREATED: {
-    subject: 'Order Confirmed - AuraFarm',
+    subject: 'Order Confirmed - LittleFlame',
     body: `
       <h2>Hello {{userName}}!</h2>
       <p>Your order has been confirmed!</p>
@@ -29,7 +29,7 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
     `,
   },
   ORDER_PACKED: {
-    subject: 'Your Order is Packed - AuraFarm',
+    subject: 'Your Order is Packed - LittleFlame',
     body: `
       <h2>Hello {{userName}}!</h2>
       <p>Great news! Your order has been packed and is ready to ship.</p>
@@ -41,7 +41,7 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
     `,
   },
   ORDER_SHIPPED: {
-    subject: 'Your Order is Shipped - AuraFarm',
+    subject: 'Your Order is Shipped - LittleFlame',
     body: `
       <h2>Hello {{userName}}!</h2>
       <p>Your order is on its way!</p>
@@ -54,7 +54,7 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
     `,
   },
   ORDER_DELIVERED: {
-    subject: 'Order Delivered - AuraFarm',
+    subject: 'Order Delivered - LittleFlame',
     body: `
       <h2>Hello {{userName}}!</h2>
       <p>Your order has been delivered!</p>
@@ -63,7 +63,7 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
       <h3>Order Summary:</h3>
       {{products}}
       <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
-      <p>Thank you for shopping with AuraFarm! We hope you love your candles.</p>
+      <p>Thank you for shopping with LittleFlame! We hope you love your candles.</p>
     `,
   },
 };

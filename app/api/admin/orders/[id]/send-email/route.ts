@@ -32,7 +32,7 @@ async function handler(
 
     const foundTemplate = await EmailTemplate.findOne({ type: templateType });
     const subject =
-      foundTemplate?.subject ?? `Order ${order.orderStatus} - AuraFarm`;
+      foundTemplate?.subject ?? `Order ${order.orderStatus} - LittleFlame`;
     const body =
       foundTemplate?.body ??
       `

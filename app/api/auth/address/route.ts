@@ -25,6 +25,16 @@ async function handler(req: AuthRequest) {
       return NextResponse.json({ error: 'Invalid pincode. Must be 6 digits' }, { status: 400 });
     }
 
+    // Metro cities validation (Delhi, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata, Pune)
+    const allowedPrefixes = ['110', '400', '560', '600', '500', '700', '411'];
+    const isMetroZip = allowedPrefixes.some((prefix) => pin.startsWith(prefix));
+    if (!isMetroZip) {
+      return NextResponse.json(
+        { error: 'Invalid ZIP for metro delivery. Supported metros: Delhi, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata, Pune' },
+        { status: 400 }
+      );
+    }
+
     const fullAddress = full && full.trim().length ? String(full).trim() : `${street}, ${city}, ${state} - ${pin}`;
 
     const user = await User.findByIdAndUpdate(

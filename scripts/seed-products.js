@@ -27,7 +27,7 @@ if (fs.existsSync(envPath)) {
 
 const mongoose = require('mongoose');
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/aurafarm';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/littleflame';
 
 const sampleProducts = [
   {

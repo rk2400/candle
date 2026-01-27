@@ -91,16 +91,27 @@ export async function createAccount(name: string, email: string, phone: string) 
   return data;
 }
 
-export async function checkout(products: Array<{ productId: string; quantity: number }>) {
+export async function checkout(products: Array<{ productId: string; quantity: number }>, couponCode?: string) {
   const res = await fetch(`${API_URL}/api/checkout`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ products }),
+    body: JSON.stringify({ products, couponCode }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Failed to checkout');
   return data.order;
+}
+
+export async function validateCoupon(code: string, products: Array<{ productId: string; quantity: number }>) {
+  const res = await fetch(`${API_URL}/api/coupons/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, products }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to validate promo code');
+  return data;
 }
 
 export async function verifyPayment(payload: any) {
@@ -266,3 +277,57 @@ export async function getAdminUsers() {
   return data.users;
 }
 
+// Admin Coupons
+export async function getAdminCoupons() {
+  const res = await fetch(`${API_URL}/api/admin/coupons`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch coupons');
+  return data.coupons;
+}
+
+export async function getAdminCoupon(id: string) {
+  const res = await fetch(`${API_URL}/api/admin/coupons/${id}`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch coupon');
+  return data.coupon;
+}
+
+export async function createCoupon(payload: any) {
+  const res = await fetch(`${API_URL}/api/admin/coupons`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to create coupon');
+  return data.coupon;
+}
+
+export async function updateCoupon(id: string, payload: any) {
+  const res = await fetch(`${API_URL}/api/admin/coupons/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to update coupon');
+  return data.coupon;
+}
+
+export async function deleteCoupon(id: string) {
+  const res = await fetch(`${API_URL}/api/admin/coupons/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to delete coupon');
+  return data;
+}

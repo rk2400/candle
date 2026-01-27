@@ -66,7 +66,7 @@ If you have an existing deployment:
 
 2. **Add new optional variables:**
    ```env
-   APP_NAME=AuraFarm
+   APP_NAME=LittleFlame
    OTP_EXPIRY_MINUTES=10
    JWT_EXPIRY=7d
    UPI_MERCHANT_ID=mock_merchant_123

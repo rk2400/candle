@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/lib/contexts/CartContext';
 import { useUser } from '@/lib/contexts/UserContext';
-import { checkout, verifyPayment, getCurrentUser, saveAddress, AddressPayload } from '@/lib/api-client';
+import { checkout, verifyPayment, getCurrentUser, saveAddress, AddressPayload, validateCoupon } from '@/lib/api-client';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 
@@ -17,6 +17,9 @@ export default function CartPage() {
   const [editingAddress, setEditingAddress] = useState(false);
   const [address, setAddress] = useState<AddressPayload>({ street: '', city: '', state: '', pincode: '', full: '' });
   const [addrSaving, setAddrSaving] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -45,9 +48,41 @@ export default function CartPage() {
     };
   }, [user]);
 
+  useEffect(() => {
+    setDiscountAmount(0);
+  }, [items]);
+
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) {
+      toast.error('Enter a promo code');
+      return;
+    }
+    setValidatingCoupon(true);
+    try {
+      const payload = items.map((i) => ({ productId: i.productId, quantity: i.quantity }));
+      const res = await validateCoupon(couponCode.trim(), payload);
+      setDiscountAmount(res.discountAmount || 0);
+      if (res.discountAmount > 0) {
+        toast.success(`Promo applied: ₹${res.discountAmount} off`);
+      } else {
+        toast('Promo code valid but no discount for this cart');
+      }
+    } catch (e: any) {
+      setDiscountAmount(0);
+      toast.error(e?.message || 'Invalid promo code');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  }
+
   async function handleSaveAddress() {
     if (!address.pincode || !/^[0-9]{6}$/.test(address.pincode)) {
-      toast.error('Please enter a valid 6-digit pincode');
+      toast.error('Please enter a valid 6-digit ZIP code');
+      return;
+    }
+    const allowedPrefixes = ['110', '400', '560', '600', '500', '700', '411'];
+    if (!allowedPrefixes.some((p) => address.pincode.startsWith(p))) {
+      toast.error('ZIP must be for metro cities: Delhi, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata, Pune');
       return;
     }
     setAddrSaving(true);
@@ -94,7 +129,7 @@ export default function CartPage() {
         return;
       }
 
-      const order = await checkout(items);
+      const order = await checkout(items, couponCode.trim() || undefined);
       
       // Check for Razorpay Key availability
       const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
@@ -131,7 +166,7 @@ export default function CartPage() {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
-        name: 'AuraFarm',
+        name: 'LittleFlame',
         description: 'Order Payment',
         order_id: order.razorpayOrderId,
         handler: async function (response: any) {
@@ -248,13 +283,36 @@ export default function CartPage() {
                   <span>Subtotal</span>
                   <span>₹{getTotal()}</span>
                 </div>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      className="input flex-1 h-10 text-sm"
+                      placeholder="Enter promo code"
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={validatingCoupon || items.length === 0}
+                      className="btn btn-secondary h-10 px-4 text-sm"
+                    >
+                      {validatingCoupon ? 'Applying...' : 'Apply'}
+                    </button>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-green-700">
+                      <span>Discount</span>
+                      <span>-₹{discountAmount}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex justify-between text-stone-600">
                   <span>Shipping</span>
                   <span className="text-green-600 font-medium">Free</span>
                 </div>
                 <div className="border-t border-stone-100 pt-4 flex justify-between font-bold text-lg text-stone-900">
                   <span>Total</span>
-                  <span>₹{getTotal()}</span>
+                  <span>₹{Math.max(0, getTotal() - discountAmount)}</span>
                 </div>
               </div>
 
@@ -272,45 +330,49 @@ export default function CartPage() {
                   </div>
 
                   {editingAddress ? (
-                    <div className="space-y-3">
-                      <input
-                        placeholder="Full Address"
+                    <div className="space-y-4">
+                      <textarea
+                        placeholder="Full Address (Apartment, Street, Landmark)"
                         value={address.full}
                         onChange={(e) => setAddress({ ...address, full: e.target.value })}
-                        className="input w-full text-sm"
+                        className="input w-full text-sm min-h-[96px]"
+                        rows={4}
                       />
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                           placeholder="Street"
                           value={address.street}
                           onChange={(e) => setAddress({ ...address, street: e.target.value })}
-                          className="input w-full text-sm"
+                          className="input w-full text-sm h-12"
                         />
                         <input
                           placeholder="City"
                           value={address.city}
                           onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                          className="input w-full text-sm"
+                          className="input w-full text-sm h-12"
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                           placeholder="State"
                           value={address.state}
                           onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                          className="input w-full text-sm"
+                          className="input w-full text-sm h-12"
                         />
                         <input
-                          placeholder="Pincode"
+                          placeholder="ZIP Code"
                           value={address.pincode}
-                          onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-                          className="input w-full text-sm"
+                          onChange={(e) => setAddress({ ...address, pincode: e.target.value.replace(/\\D/g, '').slice(0, 6) })}
+                          className="input w-full text-sm h-12"
                         />
                       </div>
+                      <p className="text-xs text-stone-500">
+                        Deliveries currently supported in metro ZIPs: 110xxx (Delhi), 400xxx (Mumbai), 560xxx (Bengaluru), 600xxx (Chennai), 500xxx (Hyderabad), 700xxx (Kolkata), 411xxx (Pune)
+                      </p>
                       <button 
                         onClick={handleSaveAddress}
                         disabled={addrSaving}
-                        className="btn bg-stone-800 text-white w-full text-sm py-2"
+                        className="btn bg-stone-800 text-white w-full text-sm py-3"
                       >
                         {addrSaving ? 'Saving...' : 'Save Address'}
                       </button>

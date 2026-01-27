@@ -6,6 +6,7 @@ import User from '@/lib/models/User';
 import { withAuth, AuthRequest } from '@/lib/middleware';
 import { emailService } from '@/lib/email';
 import crypto from 'crypto';
+import Coupon from '@/lib/models/Coupon';
 
 async function handler(req: AuthRequest) {
   try {
@@ -58,13 +59,21 @@ async function handler(req: AuthRequest) {
     order.paymentId = paymentId || razorpay_payment_id || `${paymentConfig.merchantId}_${Date.now()}`;
     await order.save();
 
+    if (order.couponCode) {
+      await Coupon.findOneAndUpdate(
+        { code: (order.couponCode || '').toUpperCase() },
+        { $inc: { usedCount: 1 } },
+        { new: true }
+      );
+    }
+
     // Get user
     const user = await User.findById(req.user.userId);
 
     // Get email template
     const foundTemplate = await EmailTemplate.findOne({ type: 'ORDER_CREATED' });
     const subject =
-      foundTemplate?.subject ?? 'Order Confirmed - AuraFarm';
+      foundTemplate?.subject ?? 'Order Confirmed - LittleFlame';
     const emailBody =
       foundTemplate?.body ??
       `

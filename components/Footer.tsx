@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-6">
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-serif text-white tracking-wide">AuraFarm</span>
+              <span className="text-2xl font-serif text-white tracking-wide">LittleFlame</span>
             </Link>
             <p className="text-stone-400 leading-relaxed max-w-xs">
               Hand-poured candles crafted with sustainable soy wax and premium essential oils. Illuminating your space with intention.
@@ -74,7 +74,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-stone-500">
-          <p>&copy; {new Date().getFullYear()} AuraFarm. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} LittleFlame. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-stone-300 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-stone-300 transition-colors">Terms of Service</Link>

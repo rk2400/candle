@@ -282,7 +282,7 @@ export default function ProductDetailPage() {
           <span className="text-primary-600 font-bold tracking-widest uppercase text-xs mb-4 block">The Experience</span>
           <h2 className="text-3xl font-serif text-stone-900 mb-6">Hand-Poured with Intention</h2>
           <p className="text-stone-600 leading-relaxed">
-            Every AuraFarm candle is crafted in small batches in our studio. We use only 100% natural soy wax, 
+            Every LittleFlame candle is crafted in small batches in our studio. We use only 100% natural soy wax, 
             premium phthalate-free fragrance oils, and lead-free cotton wicks. The result is a clean burn 
             that fills your space with sophisticated scent without overwhelming it.
           </p>

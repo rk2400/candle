@@ -46,7 +46,7 @@ export default function Header() {
               </button>
 
               <Link href="/" className="text-3xl font-serif font-bold text-stone-900 tracking-tight hover:opacity-80 transition-opacity">
-                AuraFarm
+                LittleFlame
               </Link>
 
               <nav className={`hidden md:flex items-center gap-8 ${open ? 'block' : ''}`}>

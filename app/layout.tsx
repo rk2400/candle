@@ -11,8 +11,12 @@ import Script from 'next/script';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AuraFarm - Handcrafted Candles',
+  title: 'LittleFlame - Handcrafted Candles',
   description: 'Beautiful handcrafted candles for your home',
+  icons: {
+    icon: '/Logos/color_icon.png',
+    apple: '/Logos/color_icon.png',
+  },
 };
 
 export default function RootLayout({

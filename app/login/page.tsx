@@ -74,7 +74,7 @@ export default function LoginPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px] flex flex-col justify-between p-12 text-white">
-          <Link href="/" className="text-2xl font-serif tracking-wide">AuraFarm</Link>
+          <Link href="/" className="text-2xl font-serif tracking-wide">LittleFlame</Link>
           <div className="max-w-md">
             <h2 className="text-4xl font-serif mb-4 text-white/80 ">Welcome Back</h2>
             <p className="text-stone-200 text-lg">Sign in to access your order history, saved addresses, and exclusive member benefits.</p>
