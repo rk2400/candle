@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AdminHeader from '@/components/AdminHeader';
-import { getAdminUsers } from '@/lib/api-client';
+import { getAdminUsers, updateAdminUserLock } from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
 export default function AdminUsersPage() {
@@ -59,6 +59,8 @@ export default function AdminUsersPage() {
                   <th className="text-left p-4">Email</th>
                   <th className="text-left p-4">Phone</th>
                   <th className="text-left p-4">Registration Date</th>
+                  <th className="text-left p-4">Status</th>
+                  <th className="text-left p-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -70,6 +72,27 @@ export default function AdminUsersPage() {
                     <td className="p-4 text-gray-600">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
+                    <td className="p-4">
+                      <span className={`px-3 py-1 rounded-full text-xs ${user.locked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                        {user.locked ? 'Locked' : 'Active'}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <button
+                        className={`btn ${user.locked ? 'btn-secondary' : 'btn-danger'}`}
+                        onClick={async () => {
+                          try {
+                            await updateAdminUserLock(user._id, !user.locked);
+                            toast.success(user.locked ? 'User unlocked' : 'User locked');
+                            loadUsers();
+                          } catch (err: any) {
+                            toast.error(err.message || 'Failed to update user');
+                          }
+                        }}
+                      >
+                        {user.locked ? 'Unlock' : 'Lock'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -80,4 +103,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-

@@ -93,6 +93,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Block login if user account is locked
+    if (user.locked) {
+      return NextResponse.json(
+        { error: 'Your account is locked. Please contact support to unlock.' },
+        { status: 403 }
+      );
+    }
+
     // Mark user as verified
     user.verified = true;
     await user.save();
@@ -137,4 +145,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

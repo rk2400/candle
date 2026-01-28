@@ -289,6 +289,18 @@ export async function getAdminUsers() {
   return data.users;
 }
 
+export async function updateAdminUserLock(id: string, locked: boolean) {
+  const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ locked }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to update user');
+  return data.user;
+}
+
 // Admin Coupons
 export async function getAdminCoupons() {
   const res = await fetch(`${API_URL}/api/admin/coupons`, {

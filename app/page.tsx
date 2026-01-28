@@ -48,6 +48,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      
+
       {/* Featured Collection / Collections Grid */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
@@ -155,6 +157,8 @@ export default async function HomePage() {
          </div>
       </section>
 
+      
+
       {/* Story / About Section */}
       <section className="relative py-24 bg-stone-900 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-40">
@@ -177,6 +181,7 @@ export default async function HomePage() {
            </Link>
         </div>
       </section>
+          
       
     </div>
   );

@@ -173,6 +173,22 @@ function PaymentVerificationContent() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-2">Complete Your Payment</h1>
         <p className="text-gray-600">Order ID: <span className="font-mono font-bold">{order._id}</span></p>
+        <div className="card p-4 mt-4 mb-6">
+          <h2 className="text-lg font-bold mb-2">Payment Options</h2>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <input type="radio" checked readOnly />
+              <span className="font-medium">UPI (Active)</span>
+            </div>
+            <div className="flex items-center gap-2 opacity-60">
+              <input type="radio" disabled />
+              <span className="font-medium">Cash on Delivery (COD)</span>
+            </div>
+            <p className="text-xs text-stone-600">
+              COD is not available at this stage while we streamline early operations. We’ll enable it soon.
+            </p>
+          </div>
+        </div>
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 mb-8">
           <h2 className="text-sm font-bold text-amber-900 mb-2">A quick note from a small business</h2>
           <p className="text-amber-900 text-sm">

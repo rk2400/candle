@@ -48,6 +48,14 @@ export async function POST(req: NextRequest) {
       // allow OTP generation for admin email even without user
     }
 
+    // Block login if user account is locked
+    if (user && user.locked) {
+      return NextResponse.json(
+        { error: 'Your account is locked. Please contact support to unlock.' },
+        { status: 403 }
+      );
+    }
+
     // Generate OTP
     const code = generateOTP();
     console.log('[auth/login] Generated OTP for', normalizedEmail, code);

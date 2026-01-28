@@ -94,7 +94,7 @@ export default function OrdersPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-3">
-                      <span className="font-serif text-xl text-stone-900">Order #{order._id}</span>
+                      <span className="font-serif text-xl text-stone-900">Order #{String(order._id).toUpperCase()}</span>
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide ${
                         order.orderStatus === 'DELIVERED' ? 'bg-green-50 text-green-700 border border-green-100' :
                         order.orderStatus === 'SHIPPED' ? 'bg-blue-50 text-blue-700 border border-blue-100' :

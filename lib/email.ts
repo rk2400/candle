@@ -90,9 +90,10 @@ class EmailService {
       totalAmount: number;
     }
   ): Promise<boolean> {
+    const upperOrderId = variables.orderId.toUpperCase();
     // Replace variables in template
     let html = template.body
-      .replace(/\{\{orderId\}\}/g, variables.orderId)
+      .replace(/\{\{orderId\}\}/g, upperOrderId)
       .replace(/\{\{userName\}\}/g, variables.userName)
       .replace(/\{\{status\}\}/g, variables.status)
       .replace(/\{\{totalAmount\}\}/g, `₹${variables.totalAmount.toFixed(2)}`);
@@ -143,9 +144,11 @@ class EmailService {
       </div>
     `;
 
+    const subjectToSend = template.subject.replace(new RegExp(variables.orderId, 'g'), upperOrderId);
+
     return this.sendEmail({
       to: email,
-      subject: template.subject,
+      subject: subjectToSend,
       html: styledHtml,
     });
   }
@@ -162,31 +165,32 @@ class EmailService {
   ): Promise<boolean> {
     let subject = '';
     let html = '';
+    const upperOrderId = variables.orderId.toUpperCase();
 
     if (status === 'submitted') {
-      subject = `Payment Received - Order #${variables.orderId}`;
+      subject = `Payment Received - Order #${upperOrderId}`;
       html = `
         <p>Hi ${variables.userName},</p>
-        <p>We have received your payment for order <strong>#${variables.orderId}</strong></p>
+        <p>We have received your payment for order <strong>#${upperOrderId}</strong></p>
         <p><strong>Amount: ₹${variables.totalAmount.toFixed(2)}</strong></p>
         <p>Your payment is under verification. We'll confirm the payment within 24 hours and send you an update.</p>
         <p style="margin-top: 20px; color: #666; font-size: 12px;">Thank you for your patience!</p>
       `;
     } else if (status === 'approved') {
-      subject = `Payment Confirmed! - Order #${variables.orderId}`;
+      subject = `Payment Confirmed! - Order #${upperOrderId}`;
       html = `
         <p>Hi ${variables.userName},</p>
-        <p>Great news! We have confirmed your payment for order <strong>#${variables.orderId}</strong></p>
+        <p>Great news! We have confirmed your payment for order <strong>#${upperOrderId}</strong></p>
         <p><strong>Amount: ₹${variables.totalAmount.toFixed(2)}</strong></p>
         <p>Your order is now confirmed and will be shipped soon. You'll receive tracking details shortly.</p>
         <p style="margin-top: 20px; color: #666; font-size: 12px;">Thank you for shopping with ${appConfig.name}! 🕯️</p>
       `;
     } else {
       // rejected
-      subject = `Payment Could Not Be Verified - Order #${variables.orderId}`;
+      subject = `Payment Could Not Be Verified - Order #${upperOrderId}`;
       html = `
         <p>Hi ${variables.userName},</p>
-        <p>We could not verify the payment for order <strong>#${variables.orderId}</strong></p>
+        <p>We could not verify the payment for order <strong>#${upperOrderId}</strong></p>
         ${variables.rejectionReason ? `<p><strong>Reason:</strong> ${variables.rejectionReason}</p>` : ''}
         <p>The amount <strong>₹${variables.totalAmount.toFixed(2)}</strong> is available for you to pay again.</p>
         <p>Please contact our support team if you have any questions.</p>

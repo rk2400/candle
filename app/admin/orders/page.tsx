@@ -138,7 +138,7 @@ export default function AdminOrdersPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <p className="text-sm text-gray-500">Order ID</p>
-                    <p className="font-semibold font-mono text-sm">{order._id}</p>
+                    <p className="font-semibold font-mono text-sm">{String(order._id).toUpperCase()}</p>
                     <p className="text-sm text-gray-500 mt-1">
                       {order.userId?.name || order.userId?.email || 'N/A'} • {order.userId?.email || ''}
                     </p>
@@ -287,4 +287,3 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
-

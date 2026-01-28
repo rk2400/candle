@@ -8,7 +8,7 @@ export const GET = withAdminAuth(async (req) => {
     await connectDB();
 
     const users = await User.find()
-      .select('name email phone createdAt')
+      .select('name email phone createdAt locked')
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ users });

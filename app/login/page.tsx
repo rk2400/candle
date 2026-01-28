@@ -16,6 +16,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   function QueryInit({ setEmail, setStep }: { setEmail: (v: string) => void; setStep: (v: 'email' | 'otp') => void }) {
     const searchParams = useSearchParams();
@@ -35,6 +36,7 @@ export default function LoginPage() {
       await login(email);
       toast.success('OTP sent to your email!');
       setStep('otp');
+      setResendCooldown(60);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -63,6 +65,34 @@ export default function LoginPage() {
       setLoading(false);
     }
   }
+  
+  async function handleResendOTP() {
+    if (loading || resendCooldown > 0) return;
+    setLoading(true);
+    try {
+      await login(email);
+      toast.success('OTP resent to your email');
+      setResendCooldown(60);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  useEffect(() => {
+    if (step === 'otp' && resendCooldown === 0) {
+      // Do not auto-start here; started upon send
+    }
+  }, [step]);
+  
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => {
+      setResendCooldown((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   return (
     <div className="min-h-screen bg-stone-50 flex">
@@ -137,6 +167,16 @@ export default function LoginPage() {
                 className="w-full btn btn-primary py-3"
               >
                 {loading ? 'Verifying...' : 'Verify & Login'}
+              </button>
+              <button
+                type="button"
+                onClick={handleResendOTP}
+                disabled={loading || resendCooldown > 0}
+                className="w-full btn btn-secondary py-3 mt-2"
+              >
+                {resendCooldown > 0
+                  ? `Resend in ${String(Math.floor(resendCooldown / 60)).padStart(1, '0')}:${String(resendCooldown % 60).padStart(2, '0')}`
+                  : 'Resend Code'}
               </button>
               <button
                 type="button"

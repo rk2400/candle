@@ -27,6 +27,22 @@ export default function OrderDetailPage() {
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
+  function currentStepIndex(o: any) {
+    const steps = ['Payment Pending', 'Payment Submitted', 'Paid', 'Packed', 'Shipped', 'Delivered'];
+    let idx = 0;
+    if (o.paymentStatus === 'PAYMENT_PENDING') idx = 0;
+    else if (o.paymentStatus === 'PAYMENT_SUBMITTED') idx = 1;
+    else if (o.paymentStatus === 'PAYMENT_REJECTED') idx = 1;
+    else if (o.paymentStatus === 'PAID') {
+      if (o.orderStatus === 'CREATED') idx = 2;
+      else if (o.orderStatus === 'PACKED') idx = 3;
+      else if (o.orderStatus === 'SHIPPED') idx = 4;
+      else if (o.orderStatus === 'DELIVERED') idx = 5;
+      else if (o.orderStatus === 'CANCELLED') idx = 2;
+    }
+    return { idx, steps };
+  }
+
   useEffect(() => {
     async function loadOrder() {
       try {
@@ -73,7 +89,7 @@ export default function OrderDetailPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-serif text-stone-900 mb-2">Order Details</h1>
-                <p className="text-stone-500 font-mono text-sm">#{order._id}</p>
+                <p className="text-stone-500 font-mono text-sm">#{String(order._id).toUpperCase()}</p>
               </div>
               <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium uppercase tracking-wide ${
                 order.orderStatus === 'DELIVERED' ? 'bg-green-50 text-green-700 border border-green-100' :
@@ -97,6 +113,47 @@ export default function OrderDetailPage() {
               </svg>
               Estimated delivery by {estimatedDelivery(order.createdAt)}
             </div>
+          </div>
+
+          <div className="p-6 md:p-8">
+            <h3 className="text-lg font-serif text-stone-900 mb-4">Order Progress</h3>
+            {(() => {
+              const { idx, steps } = currentStepIndex(order);
+              const cancelled = order.orderStatus === 'CANCELLED';
+              let currentLabel = '';
+              if (cancelled) currentLabel = 'Cancelled';
+              else if (order.paymentStatus === 'PAYMENT_REJECTED') currentLabel = 'Payment Rejected';
+              else currentLabel = steps[idx];
+              return (
+                <div>
+                  <div className="flex items-center gap-2">
+                    {steps.map((label: string, i: number) => (
+                      <div key={label} className="flex items-center gap-2 flex-1">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border ${
+                            i < idx
+                              ? 'bg-primary-600 text-white border-primary-600'
+                              : i === idx && !cancelled
+                              ? 'bg-white text-primary-600 border-primary-600'
+                              : 'bg-white text-stone-400 border-stone-300'
+                          }`}
+                          aria-label={label}
+                          title={label}
+                        >
+                          {i < idx ? '✓' : i + 1}
+                        </div>
+                        {i < steps.length - 1 && (
+                          <div className={`h-0.5 flex-1 ${i < idx ? 'bg-primary-600' : 'bg-stone-200'}`}></div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 text-sm text-stone-600">
+                    {`Current Status: ${currentLabel}`}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Items */}
@@ -177,7 +234,7 @@ export default function OrderDetailPage() {
                 </div>
                 {order.paymentStatus === 'PAYMENT_PENDING' && (
                   <button
-                    onClick={() => router.push(`/payment?orderId=${order._id}`)}
+                    onClick={() => router.push(`/payment?orderId=${String(order._id).toUpperCase()}`)}
                     className="w-full mt-3 btn btn-primary"
                   >
                     Complete Payment
@@ -185,12 +242,28 @@ export default function OrderDetailPage() {
                 )}
                 {order.paymentStatus === 'PAYMENT_REJECTED' && (
                   <button
-                    onClick={() => router.push(`/payment?orderId=${order._id}`)}
+                    onClick={() => router.push(`/payment?orderId=${String(order._id).toUpperCase()}`)}
                     className="w-full mt-3 btn btn-primary"
                   >
                     Retry Payment
                   </button>
                 )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 md:p-8 border-t border-stone-100">
+            <div className="bg-stone-50 rounded-lg p-4 md:p-5 border border-stone-200">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="text-sm text-stone-700">
+                  Need to cancel this order? Contact our support team and we’ll help you.
+                </div>
+                <Link
+                  href={`/contact?orderId=${encodeURIComponent(String(order._id).toUpperCase())}&topic=cancel`}
+                  className="btn btn-secondary"
+                >
+                  Contact Support
+                </Link>
               </div>
             </div>
           </div>

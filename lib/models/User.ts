@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   phone: string;
   verified: boolean;
+  locked?: boolean;
   address?: {
     full?: string;
     street?: string;
@@ -65,6 +66,11 @@ const UserSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
+    locked: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,
@@ -90,4 +96,3 @@ UserSchema.index({ email: 1 }, { unique: true });
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;
-
