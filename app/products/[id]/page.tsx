@@ -16,6 +16,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('description');
+  const [showGoToCart, setShowGoToCart] = useState(false);
 
   const cartItem = product ? items.find(item => item.productId === product._id) : null;
   const inCartQuantity = cartItem ? cartItem.quantity : 0;
@@ -71,6 +72,7 @@ export default function ProductDetailPage() {
       quantity
     );
     toast.success('Added to cart!');
+    setShowGoToCart(true);
   }
 
   if (loading) {
@@ -195,12 +197,12 @@ export default function ProductDetailPage() {
                   </div>
                   
                   <div className="text-center sm:text-left">
-                    {/* <button 
-                      onClick={() => removeFromCart(product._id)}
-                      className="text-sm text-stone-400 hover:text-red-500 underline transition-colors"
+                    <button
+                      onClick={() => router.push('/cart')}
+                      className="btn btn-primary rounded-full h-10 px-6 text-sm"
                     >
-                      Remove from Cart
-                    </button> */}
+                      Go to Cart
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -233,6 +235,14 @@ export default function ProductDetailPage() {
                     <span className="w-1 h-1 bg-white rounded-full mx-1"></span>
                     <span>₹{product.price * quantity}</span>
                   </button>
+                  {showGoToCart && (
+                    <button
+                      onClick={() => router.push('/cart')}
+                      className="btn btn-secondary rounded-full h-12 px-6"
+                    >
+                      Go to Cart
+                    </button>
+                  )}
                 </div>
               )}
             </div>

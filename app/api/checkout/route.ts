@@ -18,6 +18,17 @@ async function handler(req: AuthRequest) {
     const parsed = checkoutSchema.parse(body);
     const { products, couponCode } = parsed as any;
 
+    const pendingOrdersCount = await Order.countDocuments({
+      userId: req.user.userId,
+      paymentStatus: { $in: ['PAYMENT_PENDING', 'PAYMENT_SUBMITTED'] },
+    });
+    if (pendingOrdersCount >= 3) {
+      return NextResponse.json(
+        { error: 'You have 3 orders awaiting verification. Please wait before creating new orders.' },
+        { status: 400 }
+      );
+    }
+
     // Fetch products and calculate total
     const productIds = products.map((p: any) => p.productId);
     const dbProducts = await Product.find({

@@ -24,6 +24,11 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [accountOpen, setAccountOpen] = useState(false);
 
+  useEffect(() => {
+    setOpen(false);
+    setAccountOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     clearCart();
     await logout();
@@ -184,14 +189,14 @@ export default function Header() {
         {(open || accountOpen) && (
           <div className="md:hidden border-t border-stone-100 bg-white py-4 animate-fade-in">
             <nav className="flex flex-col gap-1 px-4">
-              <Link href="/" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Home</Link>
-              <Link href="/products" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Shop</Link>
-              <Link href="/about" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Our Story</Link>
-              <Link href="/contact" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Contact</Link>
+              <Link href="/" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Home</Link>
+              <Link href="/products" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Shop</Link>
+              <Link href="/about" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Our Story</Link>
+              <Link href="/contact" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Contact</Link>
               <div className="border-t border-stone-100 my-2"></div>
               {user ? (
                 <>
-                  <Link href="/profile" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Account</Link>
+                  <Link href="/profile" onClick={() => setAccountOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Account</Link>
                   <button
                     onClick={() => { setAccountOpen(false); handleLogout(); }}
                     className="block text-left w-full px-4 py-3 rounded-lg hover:bg-stone-50 text-red-600 font-medium"
@@ -201,8 +206,8 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Login</Link>
-                  <Link href="/signup" className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Sign Up</Link>
+                  <Link href="/login" onClick={() => setAccountOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Login</Link>
+                  <Link href="/signup" onClick={() => setAccountOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Sign Up</Link>
                 </>
               )}
             </nav>

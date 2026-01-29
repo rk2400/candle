@@ -6,7 +6,7 @@ import { useCart } from '@/lib/contexts/CartContext';
 import { useUser } from '@/lib/contexts/UserContext';
 import { checkout, getCurrentUser, saveAddress, AddressPayload, validateCoupon } from '@/lib/api-client';
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotal, clearCart } = useCart();
@@ -22,6 +22,30 @@ export default function CartPage() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
+  const indianStates = [
+    'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Andaman and Nicobar Islands','Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry'
+  ];
+  const allCities = ['New Delhi','Mumbai','Bengaluru','Chennai','Hyderabad','Kolkata','Pune','Ahmedabad','Jaipur','Lucknow','Bhopal','Indore','Surat','Vadodara','Nagpur','Patna','Ranchi','Guwahati','Kochi','Thiruvananthapuram'];
+  const citiesByState: Record<string, string[]> = {
+    'Delhi': ['New Delhi','Dwarka','Rohini','Saket','Lajpat Nagar','Karol Bagh'],
+    'Maharashtra': ['Mumbai','Pune','Nagpur','Nashik','Thane','Aurangabad'],
+    'Karnataka': ['Bengaluru','Mysuru','Mangaluru','Hubballi','Belagavi'],
+    'Tamil Nadu': ['Chennai','Coimbatore','Madurai','Salem','Tiruchirappalli'],
+    'Telangana': ['Hyderabad','Warangal','Nizamabad','Karimnagar'],
+    'West Bengal': ['Kolkata','Siliguri','Durgapur','Asansol','Howrah'],
+    'Gujarat': ['Ahmedabad','Surat','Vadodara','Rajkot'],
+    'Uttar Pradesh': ['Lucknow','Kanpur','Noida','Ghaziabad','Varanasi','Agra'],
+    'Madhya Pradesh': ['Bhopal','Indore','Jabalpur','Gwalior','Ujjain'],
+    'Rajasthan': ['Jaipur','Udaipur','Jodhpur','Kota','Ajmer'],
+    'Kerala': ['Kochi','Thiruvananthapuram','Kozhikode','Thrissur'],
+    'Bihar': ['Patna','Gaya','Muzaffarpur','Bhagalpur'],
+    'Jharkhand': ['Ranchi','Jamshedpur','Dhanbad','Hazaribagh'],
+    'Assam': ['Guwahati','Silchar','Dibrugarh','Jorhat']
+  };
+  const cityOptions = useMemo(() => {
+    const key = (address.state || '').toString();
+    return citiesByState[key] || allCities;
+  }, [address.state]);
 
   useEffect(() => {
     let mounted = true;
@@ -79,12 +103,7 @@ export default function CartPage() {
 
   async function handleSaveAddress() {
     if (!address.pincode || !/^[0-9]{6}$/.test(address.pincode)) {
-      toast.error('Please enter a valid 6-digit ZIP code');
-      return;
-    }
-    const allowedPrefixes = ['110', '400', '560', '600', '500', '700', '411'];
-    if (!allowedPrefixes.some((p) => address.pincode.startsWith(p))) {
-      toast.error('ZIP must be for metro cities: Delhi, Mumbai, Bengaluru, Chennai, Hyderabad, Kolkata, Pune');
+      toast.error('Please enter a valid 6-digit PIN code');
       return;
     }
     setAddrSaving(true);
@@ -307,7 +326,16 @@ export default function CartPage() {
                           value={address.city}
                           onChange={(e) => setAddress({ ...address, city: e.target.value })}
                           className="input w-full text-sm h-12"
+                          list="cityList"
                         />
+                        <datalist id="cityList">
+                          {cityOptions
+                            .filter((c) => !address.city || c.toLowerCase().includes(address.city.toLowerCase()))
+                            .slice(0, 10)
+                            .map((c) => (
+                              <option key={c} value={c} />
+                            ))}
+                        </datalist>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
@@ -315,7 +343,16 @@ export default function CartPage() {
                           value={address.state}
                           onChange={(e) => setAddress({ ...address, state: e.target.value })}
                           className="input w-full text-sm h-12"
+                          list="stateList"
                         />
+                        <datalist id="stateList">
+                          {indianStates
+                            .filter((s) => !address.state || s.toLowerCase().includes(address.state.toLowerCase()))
+                            .slice(0, 10)
+                            .map((s) => (
+                              <option key={s} value={s} />
+                            ))}
+                        </datalist>
                         <input
                           placeholder="ZIP Code"
                           value={address.pincode}
@@ -323,9 +360,6 @@ export default function CartPage() {
                           className="input w-full text-sm h-12"
                         />
                       </div>
-                      <p className="text-xs text-stone-500">
-                        Deliveries currently supported in metro ZIPs: 110xxx (Delhi), 400xxx (Mumbai), 560xxx (Bengaluru), 600xxx (Chennai), 500xxx (Hyderabad), 700xxx (Kolkata), 411xxx (Pune)
-                      </p>
                       <button 
                         onClick={handleSaveAddress}
                         disabled={addrSaving}
@@ -355,10 +389,6 @@ export default function CartPage() {
               >
                 {processing ? 'Processing...' : 'Checkout'}
               </button>
-              
-              <p className="text-center text-xs text-stone-400 mt-4">
-                Secure checkout powered by Razorpay
-              </p>
             </div>
           </div>
         </div>

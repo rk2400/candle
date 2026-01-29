@@ -103,8 +103,8 @@ export default function ProfilePage() {
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                         <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="font-serif text-lg text-stone-900">Order #{String(order._id).toUpperCase()}</span>
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <span className="font-serif text-lg text-stone-900 break-all">Order #{String(order._id).toUpperCase()}</span>
                             <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide ${
                               order.orderStatus === 'DELIVERED' ? 'bg-green-50 text-green-700 border border-green-100' :
                               order.orderStatus === 'SHIPPED' ? 'bg-blue-50 text-blue-700 border border-blue-100' :

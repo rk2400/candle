@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '@/lib/contexts/UserContext';
 import toast from 'react-hot-toast';
 
 export default function ContactPage() {
+  const { user } = useUser();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -183,4 +195,3 @@ function SocialButton({ label }: { label: string }) {
     </button>
   );
 }
-
