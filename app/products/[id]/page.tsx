@@ -121,7 +121,6 @@ export default function ProductDetailPage() {
 
   async function handleToggleWishlist() {
     if (!user) {
-      toast.error('Please login to manage wishlist');
       router.push('/login');
       return;
     }

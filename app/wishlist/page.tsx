@@ -15,17 +15,22 @@
    const { user } = useUser();
    const router = useRouter();
  
-   useEffect(() => {
-     loadWishlist();
-   }, []);
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      setLoading(false);
+      return;
+    }
+    loadWishlist();
+  }, [user]);
  
    async function loadWishlist() {
      try {
        const list = await getWishlist();
        setItems(list);
-     } catch (e: any) {
-       toast.error(e.message || 'Failed to load wishlist');
-     } finally {
+    } catch (e: any) {
+      // silently ignore errors
+    } finally {
        setLoading(false);
      }
    }
