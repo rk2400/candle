@@ -13,6 +13,7 @@ const TEMPLATE_TYPES = [
   { value: 'ORDER_SHIPPED', label: 'Order Shipped' },
   { value: 'ORDER_DELIVERED', label: 'Order Delivered' },
   { value: 'ORDER_CANCELLED', label: 'Order Cancelled' },
+  { value: 'ORDER_TRACKING', label: 'Order Tracking Email' },
 ];
 
 const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
@@ -79,6 +80,18 @@ const DEFAULT_TEMPLATES: Record<string, { subject: string; body: string }> = {
       <p><strong>Total Amount:</strong> ₹{{totalAmount}}</p>
       <p>If you have any questions or concerns, please contact our support team.</p>
       <p>Thank you for your understanding.</p>
+    `,
+  },
+  ORDER_TRACKING: {
+    subject: 'Your Order is On the Way - Tracking Info',
+    body: `
+      <h2>Hello {{userName}}!</h2>
+      <p>Your order is on the way.</p>
+      <p><strong>Order ID:</strong> {{orderId}}</p>
+      <p><strong>Carrier:</strong> {{carrier}}</p>
+      <p><strong>Tracking Link:</strong> <a href="{{trackingLink}}">Track your shipment</a></p>
+      {{noteBlock}}
+      <p>Thank you for shopping with LittleFlame!</p>
     `,
   },
 };
@@ -220,4 +233,3 @@ export default function AdminEmailsPage() {
     </div>
   );
 }
-

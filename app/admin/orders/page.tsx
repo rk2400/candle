@@ -4,13 +4,20 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AdminHeader from '@/components/AdminHeader';
-import { getAdminOrders, updateOrderStatus, sendOrderEmail, cancelOrder } from '@/lib/api-client';
+import { getAdminOrders, updateOrderStatus, sendOrderEmail, cancelOrder, sendTrackingEmail, updateOrderEstimatedDelivery } from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
 export default function AdminOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [trackingModalOrderId, setTrackingModalOrderId] = useState<string | null>(null);
+  const [trackingForm, setTrackingForm] = useState<{ trackingLink: string; carrier: string; note: string }>({
+    trackingLink: '',
+    carrier: '',
+    note: '',
+  });
+  const [sendingTracking, setSendingTracking] = useState(false);
 
   useEffect(() => {
     loadOrders();
@@ -88,6 +95,15 @@ export default function AdminOrdersPage() {
     }
   }
 
+  async function handleEstimatedUpdate(orderId: string, dateStr: string) {
+    try {
+      await updateOrderEstimatedDelivery(orderId, dateStr);
+      toast.success('Estimated delivery updated!');
+      loadOrders();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  }
   async function handleSendEmail(orderId: string) {
     try {
       await sendOrderEmail(orderId);
@@ -110,6 +126,33 @@ export default function AdminOrdersPage() {
       loadOrders();
     } catch (error: any) {
       toast.error(error.message);
+    }
+  }
+
+  function openTrackingModal(orderId: string) {
+    setTrackingModalOrderId(orderId);
+    setTrackingForm({ trackingLink: '', carrier: '', note: '' });
+  }
+
+  async function handleSendTracking() {
+    if (!trackingModalOrderId) return;
+    if (!trackingForm.trackingLink) {
+      toast.error('Enter a valid tracking link');
+      return;
+    }
+    setSendingTracking(true);
+    try {
+      await sendTrackingEmail(trackingModalOrderId, {
+        trackingLink: trackingForm.trackingLink,
+        carrier: trackingForm.carrier || undefined,
+        note: trackingForm.note || undefined,
+      });
+      toast.success('Tracking email sent');
+      setTrackingModalOrderId(null);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setSendingTracking(false);
     }
   }
 
@@ -265,6 +308,23 @@ export default function AdminOrdersPage() {
                       >
                         Send Email
                       </button>
+                      <button
+                        onClick={() => openTrackingModal(order._id)}
+                        className="btn btn-secondary"
+                        disabled={order.paymentStatus !== 'PAID'}
+                      >
+                        Send Tracking Email
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="date"
+                          value={order.estimatedDeliveryDate ? new Date(order.estimatedDeliveryDate).toISOString().slice(0, 10) : ''}
+                          onChange={(e) => handleEstimatedUpdate(order._id, e.target.value)}
+                          className="input"
+                          aria-label="Estimated Delivery Date"
+                        />
+                        <span className="text-xs text-gray-500 self-center">Set estimated delivery</span>
+                      </div>
                       {order.orderStatus !== 'DELIVERED' && (
                         <button
                           onClick={() => handleCancelOrder(order._id)}
@@ -284,6 +344,60 @@ export default function AdminOrdersPage() {
           </div>
         )}
       </main>
+      {trackingModalOrderId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+            <h3 className="text-xl font-semibold mb-4">Send Tracking Email</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Tracking Link</label>
+                <input
+                  type="url"
+                  value={trackingForm.trackingLink}
+                  onChange={(e) => setTrackingForm({ ...trackingForm, trackingLink: e.target.value })}
+                  className="input w-full"
+                  placeholder="https://carrier.example/track/ABC123"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Carrier (optional)</label>
+                <input
+                  type="text"
+                  value={trackingForm.carrier}
+                  onChange={(e) => setTrackingForm({ ...trackingForm, carrier: e.target.value })}
+                  className="input w-full"
+                  placeholder="Bluedart, Delhivery, etc."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Note (optional)</label>
+                <textarea
+                  value={trackingForm.note}
+                  onChange={(e) => setTrackingForm({ ...trackingForm, note: e.target.value })}
+                  className="input w-full h-24"
+                  placeholder="Any additional info for the customer"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  onClick={() => setTrackingModalOrderId(null)}
+                  className="btn btn-secondary"
+                  disabled={sendingTracking}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendTracking}
+                  className="btn"
+                  disabled={sendingTracking}
+                >
+                  {sendingTracking ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

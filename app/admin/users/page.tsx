@@ -92,6 +92,12 @@ export default function AdminUsersPage() {
                       >
                         {user.locked ? 'Unlock' : 'Lock'}
                       </button>
+                      <Link
+                        href={`/admin/users/${user._id}/orders`}
+                        className="btn btn-secondary ml-2"
+                      >
+                        View Orders
+                      </Link>
                     </td>
                   </tr>
                 ))}

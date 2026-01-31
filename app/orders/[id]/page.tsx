@@ -21,8 +21,11 @@ export default function OrderDetailPage() {
     return 'Order Placed';
   }
 
-  function estimatedDelivery(createdAt: string) {
-    const d = new Date(createdAt);
+  function estimatedDelivery(o: any) {
+    if (o.estimatedDeliveryDate) {
+      return new Date(o.estimatedDeliveryDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    const d = new Date(o.createdAt);
     d.setDate(d.getDate() + 7);
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   }
@@ -107,12 +110,14 @@ export default function OrderDetailPage() {
               </svg>
               Ordered on {new Date(order.createdAt).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' })}
             </div>
-            <div className="mt-2 flex items-center gap-2 text-sm text-stone-600">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h18M3 7h18M3 21h18M3 11h18M3 15h18" />
-              </svg>
-              Estimated delivery by {estimatedDelivery(order.createdAt)}
-            </div>
+            {order.orderStatus !== 'DELIVERED' && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-stone-600">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h18M3 7h18M3 21h18M3 11h18M3 15h18" />
+                </svg>
+                Estimated delivery by {estimatedDelivery(order)}
+              </div>
+            )}
           </div>
 
           <div className="p-6 md:p-8">
@@ -129,19 +134,26 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-2">
                     {steps.map((label: string, i: number) => (
                       <div key={label} className="flex items-center gap-2 flex-1">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border ${
-                            i < idx
-                              ? 'bg-primary-600 text-white border-primary-600'
-                              : i === idx && !cancelled
-                              ? 'bg-white text-primary-600 border-primary-600'
-                              : 'bg-white text-stone-400 border-stone-300'
-                          }`}
-                          aria-label={label}
-                          title={label}
-                        >
-                          {i < idx ? '✓' : i + 1}
-                        </div>
+                        {(() => {
+                          const isDelivered = order.orderStatus === 'DELIVERED';
+                          const isCompleted = i < idx || (isDelivered && i === idx);
+                          const isCurrent = i === idx && !isDelivered && !cancelled;
+                          return (
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium border ${
+                                isCompleted
+                                  ? 'bg-primary-600 text-white border-primary-600'
+                                  : isCurrent
+                                  ? 'bg-white text-primary-600 border-primary-600'
+                                  : 'bg-white text-stone-400 border-stone-300'
+                              }`}
+                              aria-label={label}
+                              title={label}
+                            >
+                              {isCompleted ? '✓' : i + 1}
+                            </div>
+                          );
+                        })()}
                         {i < steps.length - 1 && (
                           <div className={`h-0.5 flex-1 ${i < idx ? 'bg-primary-600' : 'bg-stone-200'}`}></div>
                         )}
@@ -252,21 +264,23 @@ export default function OrderDetailPage() {
             </div>
           </div>
           
-          <div className="p-6 md:p-8 border-t border-stone-100">
-            <div className="bg-stone-50 rounded-lg p-4 md:p-5 border border-stone-200">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="text-sm text-stone-700">
-                  Need to cancel this order? Contact our support team and we’ll help you.
+          {(order.orderStatus !== 'SHIPPED' && order.orderStatus !== 'DELIVERED' && order.orderStatus !== 'CANCELLED') && (
+            <div className="p-6 md:p-8 border-t border-stone-100">
+              <div className="bg-stone-50 rounded-lg p-4 md:p-5 border border-stone-200">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="text-sm text-stone-700">
+                    Need to cancel this order? Contact our support team and we’ll help you.
+                  </div>
+                  <Link
+                    href={`/contact?orderId=${encodeURIComponent(String(order._id).toUpperCase())}&topic=cancel`}
+                    className="btn btn-secondary"
+                  >
+                    Contact Support
+                  </Link>
                 </div>
-                <Link
-                  href={`/contact?orderId=${encodeURIComponent(String(order._id).toUpperCase())}&topic=cancel`}
-                  className="btn btn-secondary"
-                >
-                  Contact Support
-                </Link>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-8 text-center">

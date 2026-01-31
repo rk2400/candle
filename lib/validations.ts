@@ -29,15 +29,29 @@ export const productSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().min(1, 'Description is required'),
   price: z.number().positive('Price must be positive'),
+  discountPrice: z.number().positive().optional(),
   images: z.array(z.string().url()).min(1, 'At least one image is required'),
   status: z.enum(['active', 'inactive']),
   stock: z.number().int().min(0, 'Stock must be non-negative'),
   category: z.enum(['floral', 'fresh', 'seasonal', 'woody', 'other']).optional(),
   isBestSeller: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (typeof data.discountPrice === 'number' && data.discountPrice >= data.price) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['discountPrice'],
+      message: 'Discount price must be less than price',
+    });
+  }
 });
 
 export const orderStatusSchema = z.object({
   orderStatus: z.enum(['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED']),
+});
+
+export const adminOrderUpdateSchema = z.object({
+  orderStatus: z.enum(['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED']).optional(),
+  estimatedDeliveryDate: z.union([z.string().datetime(), z.coerce.date()]).optional(),
 });
 
 export const emailTemplateSchema = z.object({

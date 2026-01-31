@@ -4,6 +4,7 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   price: number;
+  discountPrice?: number;
   images: string[];
   status: 'active' | 'inactive';
   stock: number;
@@ -27,6 +28,10 @@ const ProductSchema: Schema = new Schema(
     price: {
       type: Number,
       required: true,
+      min: 0,
+    },
+    discountPrice: {
+      type: Number,
       min: 0,
     },
     images: {
@@ -61,6 +66,10 @@ const ProductSchema: Schema = new Schema(
   }
 );
 
-const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);
+// Ensure schema updates apply during dev by resetting cached model
+if (mongoose.models.Product) {
+  delete mongoose.models.Product;
+}
+const Product: Model<IProduct> = mongoose.model<IProduct>('Product', ProductSchema);
 
 export default Product;

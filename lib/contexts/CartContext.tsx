@@ -6,13 +6,14 @@ interface CartItem {
   productId: string;
   name: string;
   price: number;
+  originalPrice?: number;
   image?: string;
   quantity: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: { id: string; name: string; price: number; image?: string }, quantity?: number) => void;
+  addToCart: (product: { id: string; name: string; price: number; originalPrice?: number; image?: string }, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -50,7 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isMounted]);
 
-  const addToCart = (product: { id: string; name: string; price: number; image?: string }, quantity: number = 1) => {
+  const addToCart = (product: { id: string; name: string; price: number; originalPrice?: number; image?: string }, quantity: number = 1) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
@@ -119,4 +120,3 @@ export function useCart() {
   }
   return context;
 }
-

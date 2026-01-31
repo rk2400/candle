@@ -5,6 +5,7 @@ import { useUser } from '@/lib/contexts/UserContext';
 import { useCart } from '@/lib/contexts/CartContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { getWishlist } from '@/lib/api-client';
 
 export default function Header() {
   const { user, loading, logout } = useUser();
@@ -12,6 +13,19 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  
+  async function refreshWishlistCount() {
+    if (!mounted || !user) {
+      setWishlistCount(0);
+      return;
+    }
+    try {
+      const items = await getWishlist();
+      setWishlistCount(Array.isArray(items) ? items.length : 0);
+    } catch {
+    }
+  }
   
   useEffect(() => {
     setMounted(true);
@@ -28,6 +42,24 @@ export default function Header() {
     setOpen(false);
     setAccountOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    refreshWishlistCount();
+  }, [user, mounted]);
+  
+  useEffect(() => {
+    function onWishlistUpdated() {
+      refreshWishlistCount();
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('wishlist:updated', onWishlistUpdated);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('wishlist:updated', onWishlistUpdated);
+      }
+    };
+  }, [user, mounted]);
 
   const handleLogout = async () => {
     clearCart();
@@ -47,6 +79,11 @@ export default function Header() {
 
   return (
     <div>
+      {!(pathname || '').startsWith('/admin') && (
+        <div className="bg-primary-600 text-white text-xs md:text-sm py-2 px-4 text-center">
+          Welcome! Enjoy 10% off your first purchase with code: <span className="font-bold tracking-wider">WELCOME10</span>
+        </div>
+      )}
       {/* Nav: sticky at very top */}
       <div className="bg-white/95 backdrop-blur-md sticky top-0 z-50 border-b border-stone-100 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,6 +155,20 @@ export default function Header() {
 
                     {user ? (
                       <>
+                        <Link
+                          href="/wishlist"
+                          className="relative p-1 text-stone-400 hover:text-primary-600 transition-colors"
+                          title="Wishlist"
+                        >
+                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/>
+                          </svg>
+                          {wishlistCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                              {wishlistCount}
+                            </span>
+                          )}
+                        </Link>
                         <Link
                           href="/cart"
                           className="relative p-1 text-stone-400 hover:text-primary-600 transition-colors"
@@ -193,6 +244,7 @@ export default function Header() {
               <Link href="/products" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Shop</Link>
               <Link href="/about" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Our Story</Link>
               <Link href="/contact" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Contact</Link>
+              <Link href="/wishlist" onClick={() => setOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-stone-50 text-stone-600 font-medium">Wishlist</Link>
               <div className="border-t border-stone-100 my-2"></div>
               {user ? (
                 <>

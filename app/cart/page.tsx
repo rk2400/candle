@@ -233,7 +233,16 @@ export default function CartPage() {
                         +
                       </button>
                     </div>
-                    <p className="font-medium text-stone-900">₹{item.price * item.quantity}</p>
+                    <p className="font-medium text-stone-900">
+                      {typeof item.originalPrice === 'number' && item.originalPrice > item.price ? (
+                        <span className="flex items-center gap-2">
+                          <span className="text-stone-400 line-through">₹{(item.originalPrice * item.quantity).toFixed(2)}</span>
+                          <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                        </span>
+                      ) : (
+                        <>₹{(item.price * item.quantity).toFixed(2)}</>
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -389,6 +398,46 @@ export default function CartPage() {
               >
                 {processing ? 'Processing...' : 'Checkout'}
               </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-12">
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m4 0h-4l-1-4H7l-1 4H3v4h18v-4h-5z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-stone-900">100+ happy customers</p>
+                  <p className="text-sm text-stone-600">Loved by our community</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 11c0-1.657-1.343-3-3-3S6 9.343 6 11s1.343 3 3 3 3-1.343 3-3zm0 0l6-3v6l-6 3V11z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-stone-900">Safe and secure delivery</p>
+                  <p className="text-sm text-stone-600">Protected packaging</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8l6-3-6-3-6 3 6 3zm0 0v8m-6 3l6-3 6 3" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-stone-900">Website exclusive offers</p>
+                  <p className="text-sm text-stone-600">Special deals online</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -8,7 +8,14 @@ export const GET = withAdminAuth(async (req) => {
   try {
     await connectDB();
 
-    const orders = await Order.find()
+    const userId = req.nextUrl.searchParams.get('userId');
+
+    const query: any = {};
+    if (userId) {
+      query.userId = userId;
+    }
+
+    const orders = await Order.find(query)
       .sort({ createdAt: -1 })
       .populate('userId', 'name email phone')
       .populate({

@@ -65,7 +65,9 @@ async function handler(req: AuthRequest) {
       orderItems.push({
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: typeof (product as any).discountPrice === 'number' && (product as any).discountPrice < product.price
+          ? (product as any).discountPrice
+          : product.price,
         quantity: item.quantity,
         image: product.images[0],
       });

@@ -4,7 +4,7 @@ import Order from '@/lib/models/Order';
 import EmailTemplate from '@/lib/models/EmailTemplate';
 import User from '@/lib/models/User';
 import { withAdminAuth, AuthRequest } from '@/lib/middleware';
-import { orderStatusSchema } from '@/lib/validations';
+import { adminOrderUpdateSchema } from '@/lib/validations';
 import { emailService } from '@/lib/email';
 
 async function handler(
@@ -28,7 +28,7 @@ async function handler(
 
     if (req.method === 'PUT') {
       const body = await req.json();
-      const { orderStatus } = orderStatusSchema.parse(body);
+      const { orderStatus, estimatedDeliveryDate } = adminOrderUpdateSchema.parse(body);
 
       const order = await Order.findById(params.id);
       if (!order) {
@@ -36,7 +36,7 @@ async function handler(
       }
 
       // Prevent updating if order is cancelled
-      if (order.orderStatus === 'CANCELLED' && orderStatus !== 'CANCELLED') {
+      if (order.orderStatus === 'CANCELLED' && orderStatus && orderStatus !== 'CANCELLED') {
         return NextResponse.json(
           { error: 'Cannot update status of a cancelled order' },
           { status: 400 }
@@ -44,11 +44,16 @@ async function handler(
       }
 
       const oldStatus = order.orderStatus;
-      order.orderStatus = orderStatus;
+      if (orderStatus) {
+        order.orderStatus = orderStatus;
+      }
+      if (estimatedDeliveryDate) {
+        order.estimatedDeliveryDate = new Date(estimatedDeliveryDate as any);
+      }
       await order.save();
 
       // Send email if status changed
-      if (oldStatus !== orderStatus && order.paymentStatus === 'PAID') {
+      if (orderStatus && oldStatus !== orderStatus && order.paymentStatus === 'PAID') {
         const user = await User.findById(order.userId);
         if (user) {
           // Determine template type based on order status

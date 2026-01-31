@@ -13,7 +13,8 @@ export default function NewProductPage() {
     name: '',
     description: '',
     price: '',
-    images: '',
+    discountPrice: '',
+    images: [] as string[],
     status: 'active' as 'active' | 'inactive',
     stock: '0',
     category: 'other' as 'floral' | 'fresh' | 'seasonal' | 'woody' | 'other',
@@ -24,10 +25,14 @@ export default function NewProductPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const images = formData.images.split(',').map((url) => url.trim()).filter(Boolean);
+      const images = (formData.images || []).map((url) => url.trim()).filter(Boolean);
+      if (images.length === 0) {
+        throw new Error('Please add at least one valid image URL');
+      }
       await createProduct({
         ...formData,
         price: parseFloat(formData.price),
+        discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : undefined,
         stock: parseInt(formData.stock),
         images,
       });
@@ -79,6 +84,17 @@ export default function NewProductPage() {
             />
           </div>
           <div>
+            <label className="block text-sm font-medium mb-2">Discount Price (₹)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={formData.discountPrice}
+              onChange={(e) => setFormData({ ...formData, discountPrice: e.target.value })}
+              className="input"
+              placeholder="Optional"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium mb-2">Stock Quantity</label>
             <input
               type="number"
@@ -90,17 +106,46 @@ export default function NewProductPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">
-              Image URLs (comma-separated)
-            </label>
-            <input
-              type="text"
-              value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              className="input"
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-              required
-            />
+            <label className="block text-sm font-medium mb-2">Image URLs</label>
+            <div className="space-y-3">
+              {(formData.images.length ? formData.images : ['']).map((img, idx) => (
+                <div key={idx} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={img}
+                    onChange={(e) => {
+                      const next = [...(formData.images.length ? formData.images : [''])];
+                      next[idx] = e.target.value;
+                      setFormData({ ...formData, images: next });
+                    }}
+                    className="input flex-1"
+                    placeholder="https://example.com/image.jpg"
+                    required={idx === 0}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      const next = [...(formData.images.length ? formData.images : [''])];
+                      if (next.length > 1) {
+                        next.splice(idx, 1);
+                        setFormData({ ...formData, images: next });
+                      }
+                    }}
+                    disabled={(formData.images.length ? formData.images : ['']).length <= 1}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setFormData({ ...formData, images: [...(formData.images || []), ''] })}
+              >
+                Add Image
+              </button>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Category</label>
@@ -140,4 +185,3 @@ export default function NewProductPage() {
     </div>
   );
 }
-

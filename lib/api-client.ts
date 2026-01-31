@@ -19,6 +19,68 @@ export async function getProduct(id: string) {
   return data.product;
 }
 
+export async function getProductReviews(productId: string) {
+  const res = await fetch(`${API_URL}/api/products/${productId}/reviews`, { cache: 'no-store' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch reviews');
+  return data;
+}
+
+export async function submitReview(payload: { productId: string; orderId: string; rating: number; comment?: string }) {
+  const res = await fetch(`${API_URL}/api/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to submit review');
+  return data.review;
+}
+
+export async function adminDeleteReview(id: string) {
+  const res = await fetch(`${API_URL}/api/admin/reviews/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to delete review');
+  return data;
+}
+
+// Wishlist
+export async function getWishlist() {
+  const res = await fetch(`${API_URL}/api/wishlist`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch wishlist');
+  return data.items;
+}
+
+export async function addToWishlist(productId: string) {
+  const res = await fetch(`${API_URL}/api/wishlist`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ productId }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to add to wishlist');
+  return data;
+}
+
+export async function removeFromWishlist(productId: string) {
+  const res = await fetch(`${API_URL}/api/wishlist/${productId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to remove from wishlist');
+  return data;
+}
+
 export async function login(email: string) {
   const res = await fetch(`${API_URL}/api/auth/login`, {
     method: 'POST',
@@ -213,12 +275,34 @@ export async function getAdminOrders() {
   return data.orders;
 }
 
+export async function getAdminUserOrders(userId: string) {
+  const res = await fetch(`${API_URL}/api/admin/orders?userId=${encodeURIComponent(userId)}`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch user orders');
+  return data.orders;
+}
+
 export async function updateOrderStatus(id: string, orderStatus: string) {
   const res = await fetch(`${API_URL}/api/admin/orders/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify({ orderStatus }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to update order');
+  return data.order;
+}
+
+export async function updateOrderEstimatedDelivery(id: string, estimatedDateISO: string) {
+  const res = await fetch(`${API_URL}/api/admin/orders/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ estimatedDeliveryDate: estimatedDateISO }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Failed to update order');
@@ -232,6 +316,18 @@ export async function sendOrderEmail(id: string) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Failed to send email');
+  return data;
+}
+
+export async function sendTrackingEmail(id: string, payload: { trackingLink: string; carrier?: string; note?: string }) {
+  const res = await fetch(`${API_URL}/api/admin/orders/${id}/send-tracking`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to send tracking email');
   return data;
 }
 
@@ -298,6 +394,16 @@ export async function updateAdminUserLock(id: string, locked: boolean) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Failed to update user');
+  return data.user;
+}
+
+export async function getAdminUser(id: string) {
+  const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+    credentials: 'include',
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch user');
   return data.user;
 }
 

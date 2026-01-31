@@ -42,6 +42,7 @@ export default function AdminHeader() {
             <Link href="/admin/orders" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">Orders</Link>
             <Link href="/admin/payments" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">💳 Payments</Link>
             <Link href="/admin/users" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">Users</Link>
+            <Link href="/admin/reviews" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">Reviews</Link>
             <Link href="/admin/emails" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">Email Templates</Link>
             <Link href="/" className="text-gray-700 hover:text-primary-600 flex items-center gap-2">Store</Link>
             <button onClick={() => { logout && logout(); router.push('/'); }} className="ml-4 text-sm px-3 py-1 rounded bg-red-50 text-red-600 hover:bg-red-100">Logout</button>

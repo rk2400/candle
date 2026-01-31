@@ -20,6 +20,7 @@ export interface IOrder extends Document {
   totalAmount: number;
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
+  estimatedDeliveryDate?: Date;
   address?: {
     full?: string;
     street?: string;
@@ -102,6 +103,9 @@ const OrderSchema: Schema = new Schema(
       enum: ['CREATED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
       default: 'CREATED',
     },
+    estimatedDeliveryDate: {
+      type: Date,
+    },
     paymentId: {
       type: String,
     },
@@ -140,6 +144,5 @@ if (mongoose.models.Order) {
 const Order: Model<IOrder> = mongoose.model<IOrder>('Order', OrderSchema);
 
 export default Order;
-
 
 

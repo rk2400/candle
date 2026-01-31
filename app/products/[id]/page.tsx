@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getProduct } from '@/lib/api-client';
+import { getProduct, getOrders, getProductReviews, submitReview, getWishlist } from '@/lib/api-client';
 import { useCart } from '@/lib/contexts/CartContext';
 import { useUser } from '@/lib/contexts/UserContext';
 import toast from 'react-hot-toast';
@@ -17,6 +17,14 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('description');
   const [showGoToCart, setShowGoToCart] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [reviewsData, setReviewsData] = useState<{ reviews: any[]; avgRating: number; ratingCount: number } | null>(null);
+  const [eligibleOrders, setEligibleOrders] = useState<any[]>([]);
+  const [rating, setRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [wishLoading, setWishLoading] = useState(false);
+  const [isWished, setIsWished] = useState(false);
 
   const cartItem = product ? items.find(item => item.productId === product._id) : null;
   const inCartQuantity = cartItem ? cartItem.quantity : 0;
@@ -26,6 +34,7 @@ export default function ProductDetailPage() {
       try {
         const data = await getProduct(params.id as string);
         setProduct(data);
+        setActiveImageIndex(0);
       } catch (error: any) {
         toast.error(error.message);
       } finally {
@@ -34,6 +43,112 @@ export default function ProductDetailPage() {
     }
     loadProduct();
   }, [params.id]);
+
+  useEffect(() => {
+    async function loadReviewsAndEligibility() {
+      if (!params.id) return;
+      try {
+        const r = await getProductReviews(params.id as string);
+        setReviewsData(r);
+      } catch (e: any) {
+        // ignore silently
+      }
+      try {
+        if (user) {
+          const orders = await getOrders();
+          const eligible = orders.filter((o: any) =>
+            o.orderStatus === 'DELIVERED' &&
+            (o.products || []).some((p: any) => String(p.productId?._id ?? p.productId) === String(params.id))
+          );
+          setEligibleOrders(eligible);
+        } else {
+          setEligibleOrders([]);
+        }
+      } catch (e: any) {
+        // ignore silently
+      }
+    }
+    loadReviewsAndEligibility();
+  }, [params.id, user]);
+
+  useEffect(() => {
+    async function checkWishlist() {
+      if (!user || !params.id) {
+        setIsWished(false);
+        return;
+      }
+      try {
+        const items = await getWishlist();
+        const found = items.some((w: any) => String(w.productId?._id ?? w.productId) === String(params.id));
+        setIsWished(found);
+      } catch {
+        // ignore
+      }
+    }
+    checkWishlist();
+  }, [params.id, user]);
+
+  async function handleSubmitReview() {
+    if (!user) {
+      toast.error('Please login to submit a rating');
+      router.push('/login');
+      return;
+    }
+    const orderId = eligibleOrders[0]?._id;
+    if (!orderId) {
+      toast.error('Ratings are allowed only after delivery of your order');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      await submitReview({
+        productId: params.id as string,
+        orderId,
+        rating,
+        comment: comment?.trim() || undefined,
+      });
+      toast.success('Thank you for your review!');
+      setComment('');
+      setRating(5);
+      const r = await getProductReviews(params.id as string);
+      setReviewsData(r);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to submit review');
+    } finally {
+      setSubmittingReview(false);
+    }
+  }
+
+  async function handleToggleWishlist() {
+    if (!user) {
+      toast.error('Please login to manage wishlist');
+      router.push('/login');
+      return;
+    }
+    setWishLoading(true);
+    try {
+      const { addToWishlist, removeFromWishlist } = await import('@/lib/api-client');
+      if (isWished) {
+        await removeFromWishlist(params.id as string);
+        setIsWished(false);
+        toast.success('Removed from wishlist');
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist:updated'));
+        }
+      } else {
+        await addToWishlist(params.id as string);
+        setIsWished(true);
+        toast.success('Added to wishlist');
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('wishlist:updated'));
+        }
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to update wishlist');
+    } finally {
+      setWishLoading(false);
+    }
+  }
 
   function handleUpdateQuantity(newQty: number) {
     if (!product) return;
@@ -66,7 +181,8 @@ export default function ProductDetailPage() {
       {
         id: product._id,
         name: product.name,
-        price: product.price,
+        price: typeof product.discountPrice === 'number' && product.discountPrice < product.price ? product.discountPrice : product.price,
+        originalPrice: product.price,
         image: product.images?.[0],
       },
       quantity
@@ -97,6 +213,12 @@ export default function ProductDetailPage() {
     );
   }
 
+  const alreadyReviewed = !!(
+    reviewsData &&
+    user &&
+    reviewsData.reviews.some((r: any) => String(r.userId?._id ?? r.userId) === String(user.id))
+  );
+
   return (
     <div className="min-h-screen bg-stone-50">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
@@ -105,9 +227,9 @@ export default function ProductDetailPage() {
           {/* Left Column: Images */}
           <div className="space-y-6">
             <div className="aspect-square bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 relative group">
-              {product.images && product.images[0] ? (
+              {product.images && product.images[activeImageIndex] ? (
                 <img
-                  src={product.images[0]}
+                  src={product.images[activeImageIndex]}
                   alt={product.name}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
@@ -116,7 +238,7 @@ export default function ProductDetailPage() {
                   No Image
                 </div>
               )}
-              {/* Overlay Badge (Mock) */}
+              {/* Overlays */}
               <div className="absolute top-4 left-4 flex gap-2">
                 <div className="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold tracking-wider text-stone-900 uppercase">
                   Best Seller
@@ -127,13 +249,39 @@ export default function ProductDetailPage() {
                   </div>
                 )}
               </div>
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={handleToggleWishlist}
+                  className={`w-10 h-10 rounded-full border flex items-center justify-center shadow-sm transition-colors ${
+                    isWished ? 'bg-primary-600 border-primary-600 text-white' : 'bg-white/90 backdrop-blur border-stone-200 text-stone-600 hover:text-primary-600'
+                  }`}
+                  aria-label={isWished ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                  disabled={wishLoading}
+                  title={isWished ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  {isWished ? (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/>
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
             
             {/* Thumbnail Grid (Mock - assuming multiple images might exist later) */}
             {product.images && product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
                 {product.images.map((img: string, idx: number) => (
-                  <button key={idx} className="aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary-500 transition-all">
+                  <button
+                    key={idx}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-primary-500' : 'border-transparent hover:border-primary-500'}`}
+                    onClick={() => setActiveImageIndex(idx)}
+                    title="View image"
+                  >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
@@ -147,8 +295,22 @@ export default function ProductDetailPage() {
               <span className="text-sm font-medium text-primary-600 tracking-widest uppercase">Signature Collection</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4">{product.name}</h1>
-            <div className="flex items-center gap-3 mb-8">
-              <p className="text-2xl font-medium text-stone-600">₹{product.price}</p>
+            <div className="flex items-center gap-3 mb-2">
+              <p className="text-2xl font-medium text-stone-600">
+                {typeof product.discountPrice === 'number' && product.discountPrice < product.price ? (
+                  <span className="flex items-center gap-3">
+                    <span className="text-stone-400 line-through">₹{product.price}</span>
+                    <span className="text-stone-900">₹{product.discountPrice}</span>
+                  </span>
+                ) : (
+                  <>₹{product.price}</>
+                )}
+              </p>
+              {typeof product.discountPrice === 'number' && product.discountPrice < product.price && (
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                  Limited Time Deal!
+                </span>
+              )}
               {product.stock === 0 ? (
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-100">
                   Out of Stock
@@ -159,6 +321,21 @@ export default function ProductDetailPage() {
                 </span>
               )}
             </div>
+            <div className="text-sm text-stone-600 mb-6">
+              Orders are typically shipped within 3 days of placing the order.
+            </div>
+            {reviewsData && (
+              <div className="flex items-center gap-2 mb-8">
+                <div className="flex items-center text-yellow-500">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg key={i} className={`w-5 h-5 ${i < Math.round(reviewsData.avgRating) ? '' : 'opacity-30'}`} viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                  ))}
+                </div>
+                <span className="text-sm text-stone-600">{reviewsData.avgRating.toFixed(1)} • {reviewsData.ratingCount} ratings</span>
+              </div>
+            )}
 
             <div className="prose prose-stone mb-8 text-stone-600 leading-relaxed">
               <p>{product.description}</p>
@@ -233,7 +410,11 @@ export default function ProductDetailPage() {
                   >
                     <span>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
                     <span className="w-1 h-1 bg-white rounded-full mx-1"></span>
-                    <span>₹{product.price * quantity}</span>
+                    <span>
+                      ₹{(
+                        (typeof product.discountPrice === 'number' && product.discountPrice < product.price ? product.discountPrice : product.price) * quantity
+                      )}
+                    </span>
                   </button>
                   {showGoToCart && (
                     <button
@@ -285,6 +466,69 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </main>
+
+      <section className="bg-white py-20 border-t border-stone-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row gap-12">
+            <div className="flex-1">
+              <h2 className="text-2xl font-serif text-stone-900 mb-6">Customer Reviews</h2>
+              {!reviewsData || reviewsData.reviews.length === 0 ? (
+                <p className="text-stone-600">No reviews yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviewsData.reviews.slice(0, 10).map((r: any) => (
+                    <div key={r._id} className="p-4 border border-stone-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-medium">{r.userId?.name || 'Customer'}</div>
+                        <div className="flex items-center text-yellow-500">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <svg key={i} className={`w-4 h-4 ${i < r.rating ? '' : 'opacity-30'}`} viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M11.48 3.5a1 1 0 011.04 0l3.06 1.86 3.49.54a1 1 0 01.56 1.72l-2.52 2.6.62 3.55a1 1 0 01-1.48 1.04L12 13.9l-3.25 1.91a1 1 0 01-1.48-1.04l.62-3.55-2.52-2.6a1 1 0 01.56-1.72l3.49-.54 3.06-1.86z"/>
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                      {r.comment && <p className="text-stone-700 text-sm">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {(eligibleOrders.length > 0 && !alreadyReviewed) && (
+              <div className="w-full md:w-96">
+                <h3 className="text-xl font-serif text-stone-900 mb-4">Add Your Rating</h3>
+                <div className="card p-4">
+                  <div className="mb-3">
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <button key={i} onClick={() => setRating(i + 1)} aria-label={`Rate ${i + 1} stars`}>
+                          <svg className={`w-6 h-6 ${i < rating ? '' : 'opacity-30'}`} viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.48 3.5a1 1 0 011.04 0l3.06 1.86 3.49.54a1 1 0 01.56 1.72l-2.52 2.6.62 3.55a1 1 0 01-1.48 1.04L12 13.9l-3.25 1.91a1 1 0 01-1.48-1.04l.62-3.55-2.52-2.6a1 1 0 01.56-1.72l3.49-.54 3.06-1.86z"/>
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Share your experience (optional)"
+                    className="input w-full h-24"
+                  />
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={submittingReview}
+                    className="btn btn-primary w-full mt-3"
+                  >
+                    {submittingReview ? 'Submitting...' : 'Submit Rating'}
+                  </button>
+                  <p className="text-xs text-stone-500 mt-2">Ratings are available only for delivered orders. One rating per order item.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Story / Context Section */}
       <section className="bg-white py-20 border-t border-stone-100">

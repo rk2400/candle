@@ -73,7 +73,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
         <div className="mt-4 flex items-center justify-between">
           <span className="text-xl font-medium text-stone-900">
-            ₹{product.price.toLocaleString('en-IN')}
+            {typeof (product as any).discountPrice === 'number' && (product as any).discountPrice < product.price ? (
+              <span className="flex items-center gap-2">
+                <span className="text-stone-400 line-through">₹{product.price.toLocaleString('en-IN')}</span>
+                <span>₹{(product as any).discountPrice.toLocaleString('en-IN')}</span>
+              </span>
+            ) : (
+              <>₹{product.price.toLocaleString('en-IN')}</>
+            )}
           </span>
           <span className="text-sm font-medium text-primary-600 group-hover:underline">
             Shop Now &rarr;
