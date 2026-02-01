@@ -19,6 +19,11 @@ export default function EditProductPage() {
     status: 'active' as 'active' | 'inactive',
     stock: '0',
     category: 'other' as 'floral' | 'fresh' | 'seasonal' | 'woody' | 'other',
+    scentTop: '',
+    scentMiddle: '',
+    scentBase: '',
+    vesselDetails: '',
+    careInstructions: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,6 +41,11 @@ export default function EditProductPage() {
           status: product.status,
           stock: (product.stock || 0).toString(),
           category: product.category,
+          scentTop: Array.isArray(product.scentNotes?.top) ? product.scentNotes.top.join('\n') : '',
+          scentMiddle: Array.isArray(product.scentNotes?.middle) ? product.scentNotes.middle.join('\n') : '',
+          scentBase: Array.isArray(product.scentNotes?.base) ? product.scentNotes.base.join('\n') : '',
+          vesselDetails: product.vesselDetails || '',
+          careInstructions: Array.isArray(product.careInstructions) ? product.careInstructions.join('\n') : '',
         });
       } catch (error: any) {
         toast.error(error.message);
@@ -60,6 +70,21 @@ export default function EditProductPage() {
         discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : undefined,
         stock: parseInt(formData.stock),
         images,
+        scentNotes: {
+          top: formData.scentTop
+            ? formData.scentTop.split('\n').map((s) => s.trim()).filter(Boolean)
+            : [],
+          middle: formData.scentMiddle
+            ? formData.scentMiddle.split('\n').map((s) => s.trim()).filter(Boolean)
+            : [],
+          base: formData.scentBase
+            ? formData.scentBase.split('\n').map((s) => s.trim()).filter(Boolean)
+            : [],
+        },
+        vesselDetails: formData.vesselDetails,
+        careInstructions: formData.careInstructions
+          ? formData.careInstructions.split('\n').map((s) => s.trim()).filter(Boolean)
+          : [],
       });
       toast.success('Product updated!');
       router.push('/admin/products');
@@ -94,6 +119,55 @@ export default function EditProductPage() {
               className="input"
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Scent Notes - Top</label>
+            <textarea
+              value={formData.scentTop}
+              onChange={(e) => setFormData({ ...formData, scentTop: e.target.value })}
+              className="input"
+              rows={3}
+            />
+            <p className="text-xs text-stone-500 mt-1">One note per line</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Scent Notes - Middle</label>
+            <textarea
+              value={formData.scentMiddle}
+              onChange={(e) => setFormData({ ...formData, scentMiddle: e.target.value })}
+              className="input"
+              rows={3}
+            />
+            <p className="text-xs text-stone-500 mt-1">One note per line</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Scent Notes - Base</label>
+            <textarea
+              value={formData.scentBase}
+              onChange={(e) => setFormData({ ...formData, scentBase: e.target.value })}
+              className="input"
+              rows={3}
+            />
+            <p className="text-xs text-stone-500 mt-1">One note per line</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Vessel & Dimensions</label>
+            <textarea
+              value={formData.vesselDetails}
+              onChange={(e) => setFormData({ ...formData, vesselDetails: e.target.value })}
+              className="input"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Care Instructions</label>
+            <textarea
+              value={formData.careInstructions}
+              onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
+              className="input"
+              rows={4}
+            />
+            <p className="text-xs text-stone-500 mt-1">One instruction per line</p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Discount Price (₹)</label>

@@ -10,6 +10,13 @@ export interface IProduct extends Document {
   stock: number;
   category: 'floral' | 'fresh' | 'seasonal' | 'woody' | 'signature' | 'gift-sets' | 'other';
   isBestSeller: boolean;
+  scentNotes?: {
+    top?: string[];
+    middle?: string[];
+    base?: string[];
+  };
+  vesselDetails?: string;
+  careInstructions?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -59,6 +66,19 @@ const ProductSchema: Schema = new Schema(
       type: Boolean,
       default: false,
       index: true,
+    },
+    scentNotes: {
+      top: { type: [String], default: [] },
+      middle: { type: [String], default: [] },
+      base: { type: [String], default: [] },
+    },
+    vesselDetails: {
+      type: String,
+      default: '',
+    },
+    careInstructions: {
+      type: [String],
+      default: [],
     },
   },
   {

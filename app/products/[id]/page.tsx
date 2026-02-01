@@ -433,32 +433,46 @@ export default function ProductDetailPage() {
                 <div className="grid grid-cols-3 gap-4 text-sm text-stone-600">
                   <div>
                     <span className="block font-bold text-stone-900 mb-1">Top</span>
-                    Bergamot, Lemon Peel
+                    {(product.scentNotes?.top && product.scentNotes.top.length
+                      ? product.scentNotes.top
+                      : ['Bergamot', 'Lemon Peel']
+                    ).join(', ')}
                   </div>
                   <div>
                     <span className="block font-bold text-stone-900 mb-1">Middle</span>
-                    Ylang Ylang, Jasmine
+                    {(product.scentNotes?.middle && product.scentNotes.middle.length
+                      ? product.scentNotes.middle
+                      : ['Ylang Ylang', 'Jasmine']
+                    ).join(', ')}
                   </div>
                   <div>
                     <span className="block font-bold text-stone-900 mb-1">Base</span>
-                    Sandalwood, Amber
+                    {(product.scentNotes?.base && product.scentNotes.base.length
+                      ? product.scentNotes.base
+                      : ['Sandalwood', 'Amber']
+                    ).join(', ')}
                   </div>
                 </div>
               </DetailsItem>
               
               <DetailsItem title="Vessel & Dimensions" isOpen={activeTab === 'vessel'} onClick={() => setActiveTab(activeTab === 'vessel' ? '' : 'vessel')}>
-                <p className="text-sm text-stone-600 leading-relaxed">
-                  Housed in a reusable matte ceramic vessel. <br />
-                  Dimensions: 3.5" H x 3.25" W <br />
-                  Weight: 12 oz (340g)
+                <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">
+                  {product.vesselDetails || 'Housed in a reusable matte ceramic vessel.\nDimensions: 3.5\" H x 3.25\" W\nWeight: 12 oz (340g)'}
                 </p>
               </DetailsItem>
 
               <DetailsItem title="Care Instructions" isOpen={activeTab === 'care'} onClick={() => setActiveTab(activeTab === 'care' ? '' : 'care')}>
                 <ul className="list-disc list-inside text-sm text-stone-600 space-y-1">
-                  <li>Trim wick to 1/4" before each burn.</li>
-                  <li>Allow wax to melt to the edges to prevent tunneling.</li>
-                  <li>Do not burn for more than 4 hours at a time.</li>
+                  {(product.careInstructions && product.careInstructions.length
+                    ? product.careInstructions
+                    : [
+                        'Trim wick to 1/4" before each burn.',
+                        'Allow wax to melt to the edges to prevent tunneling.',
+                        'Do not burn for more than 4 hours at a time.',
+                      ]
+                  ).map((item: string, idx: number) => (
+                    <li key={idx}>{item}</li>
+                  ))}
                 </ul>
               </DetailsItem>
             </div>
@@ -559,7 +573,7 @@ function DetailsItem({ title, children, isOpen, onClick }: { title: string; chil
           </svg>
         </span>
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-48 opacity-100 pb-6' : 'max-h-0 opacity-0'}`}>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100 pb-6' : 'max-h-0 opacity-0'}`}>
         {children}
       </div>
     </div>

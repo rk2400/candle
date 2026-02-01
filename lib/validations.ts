@@ -35,6 +35,15 @@ export const productSchema = z.object({
   stock: z.number().int().min(0, 'Stock must be non-negative'),
   category: z.enum(['floral', 'fresh', 'seasonal', 'woody', 'other']).optional(),
   isBestSeller: z.boolean().optional(),
+  scentNotes: z
+    .object({
+      top: z.array(z.string()).optional(),
+      middle: z.array(z.string()).optional(),
+      base: z.array(z.string()).optional(),
+    })
+    .optional(),
+  vesselDetails: z.string().optional(),
+  careInstructions: z.array(z.string()).optional(),
 }).superRefine((data, ctx) => {
   if (typeof data.discountPrice === 'number' && data.discountPrice >= data.price) {
     ctx.addIssue({
